@@ -1,0 +1,169 @@
+[
+  {
+    "name": "holiday-hero",
+    "url": "https://levoit.com/cdn/shop/files/lev-hol-26-hp-desk.png?width=1600",
+    "local": "assets/holiday-hero.webp"
+  },
+  {
+    "name": "holiday-mobile",
+    "url": "https://levoit.com/cdn/shop/files/lev-hold-26-hp-mob.png?width=900",
+    "local": "assets/holiday-mobile.webp"
+  },
+  {
+    "name": "black-friday",
+    "url": "https://levoit.com/cdn/shop/files/Banner__2042_x_938_px.png?width=1600",
+    "local": "assets/black-friday.webp"
+  },
+  {
+    "name": "pet-hero",
+    "url": "https://levoit.com/cdn/shop/files/BFAS_Desktop_Top_Banner_-_1.1.png?width=1600",
+    "local": "assets/pet-hero.webp"
+  },
+  {
+    "name": "humidifier-hero",
+    "url": "https://levoit.com/cdn/shop/files/Main_Desktop_Hero_Banner_269342e0-f8ed-4562-94c4-eb9e753e1ae6.png?width=1600",
+    "local": "assets/humidifier-hero.webp"
+  },
+  {
+    "name": "air-hero",
+    "url": "https://levoit.com/cdn/shop/files/B_Desktop_Hero_Banner.png?width=1600",
+    "local": "assets/air-hero.webp"
+  },
+  {
+    "name": "living-room",
+    "url": "https://levoit.com/cdn/shop/files/eleva_500x_slide_4_desktop.png?width=1100",
+    "local": "assets/living-room.webp"
+  },
+  {
+    "name": "sale-banner",
+    "url": "https://levoit.com/cdn/shop/files/PC_8055b0d6-cecc-4845-a46d-3a347c202c37.jpg?width=1600",
+    "local": "assets/sale-banner.webp"
+  },
+  {
+    "name": "pet-solution",
+    "url": "https://levoit.com/cdn/shop/files/19feb2fce7ff5.png?width=800",
+    "local": "assets/pet-solution.webp"
+  },
+  {
+    "name": "allergy-solution",
+    "url": "https://levoit.com/cdn/shop/files/Filtration_Focus.png?width=800",
+    "local": "assets/allergy-solution.webp"
+  },
+  {
+    "name": "sleep-solution",
+    "url": "https://levoit.com/cdn/shop/files/introduce-eleva-300x-air-purifier-for-sleep.jpg?width=800",
+    "local": "assets/sleep-solution.webp"
+  },
+  {
+    "name": "category-air",
+    "url": "https://levoit.com/cdn/shop/files/Levoit_Eleva_300X_Air_Purifier.png?width=500",
+    "local": "assets/category-air.webp"
+  },
+  {
+    "name": "category-vacuum",
+    "url": "https://levoit.com/cdn/shop/files/VortexIQ_Pro_Front_Angle_01_1.jpg?width=500",
+    "local": "assets/category-vacuum.webp"
+  },
+  {
+    "name": "category-humidifier",
+    "url": "https://levoit.com/cdn/shop/files/Levoit_Superior_Studio_Smart_Evaporative_Humidifier_1.jpg?width=500",
+    "local": "assets/category-humidifier.webp"
+  },
+  {
+    "name": "category-fan",
+    "url": "https://levoit.com/cdn/shop/files/Image_Levoit_Windi_Mini_portable_desk_tower_fan.png?width=500",
+    "local": "assets/category-fan.webp"
+  },
+  {
+    "name": "category-filter",
+    "url": "https://levoit.com/cdn/shop/files/levoit-eleva-300x-hepa-air-purifier-filter-6746803.jpg?width=500",
+    "local": "assets/category-filter.webp"
+  },
+  {
+    "name": "tech-filter",
+    "url": "https://levoit.com/cdn/shop/files/19ff53828da70.png?width=1600",
+    "local": "assets/tech-filter.webp"
+  },
+  {
+    "name": "tech-vacuum",
+    "url": "https://levoit.com/cdn/shop/files/006_Levoit_Homepage_HEPA_Filtration_Technology_V3.png?width=1600",
+    "local": "assets/tech-vacuum.webp"
+  },
+  {
+    "name": "tech-quiet",
+    "url": "https://levoit.com/cdn/shop/files/19ff4a4d7956d.png?width=1600",
+    "local": "assets/tech-quiet.webp"
+  },
+  {
+    "name": "tech-smart",
+    "url": "https://levoit.com/cdn/shop/files/043_Levoit_Homepage_Smart_Sensor_V0.png?width=1600",
+    "local": "assets/tech-smart.webp"
+  },
+  {
+    "name": "app-recipe",
+    "url": "https://levoit.com/cdn/shop/files/Frame_2147232332.png?width=500",
+    "local": "assets/app-recipe.webp"
+  },
+  {
+    "name": "app-home",
+    "url": "https://levoit.com/cdn/shop/files/Frame_2147232358.png?width=700",
+    "local": "assets/app-home.webp"
+  },
+  {
+    "name": "app-health",
+    "url": "https://levoit.com/cdn/shop/files/fesg.png?width=500",
+    "local": "assets/app-health.webp"
+  },
+  {
+    "name": "product-vital",
+    "source": "User-provided image: 830.jpg",
+    "local": "assets/product-vital.webp"
+  },
+  {
+    "name": "product-vacuum",
+    "url": "https://levoit.com/cdn/shop/files/lvac-200-cordless-vacuum-8397962.jpg?width=600",
+    "local": "assets/product-vacuum.webp"
+  },
+  {
+    "name": "product-core",
+    "url": "https://levoit.com/cdn/shop/products/levoit-core-300-air-purifier-791897.jpg?width=600",
+    "local": "assets/product-core.webp"
+  },
+  {
+    "name": "product-mini",
+    "url": "https://levoit.com/cdn/shop/products/levoit-core-mini-air-purifier-white-879881.jpg?width=600",
+    "local": "assets/product-mini.webp"
+  },
+  {
+    "name": "product-humidifier",
+    "url": "https://levoit.com/cdn/shop/products/lv600s-smart-hybrid-ultrasonic-humidifier-108379.jpg?width=600",
+    "local": "assets/product-humidifier.webp"
+  },
+  {
+    "name": "gilroy-regular",
+    "url": "https://cdn.shopify.com/s/files/1/0840/9373/1138/files/Gilroy-Regular.woff2?v=1749809641",
+    "local": "assets/gilroy-regular.woff2"
+  },
+  {
+    "name": "gilroy-semibold",
+    "url": "https://cdn.shopify.com/s/files/1/0840/9373/1138/files/Gilroy-SemiBold.woff2?v=1749809641",
+    "local": "assets/gilroy-semibold.woff2"
+  },
+  {
+    "name": "gilroy-bold",
+    "url": "https://cdn.shopify.com/s/files/1/0840/9373/1138/files/Gilroy-Bold.woff2?v=1749809641",
+    "local": "assets/gilroy-bold.woff2"
+  },
+  {
+    "name": "atohome-logo",
+    "source": "User-provided PDF: Atohome-转曲.pdf",
+    "local": "assets/atohome-logo.svg",
+    "variant": "Original outlined vector artwork, trimmed to content"
+  },
+  {
+    "name": "atohome-logo-light",
+    "source": "User-provided PDF: Atohome-转曲.pdf",
+    "local": "assets/atohome-logo-light.svg",
+    "variant": "Black lettering changed to white for dark backgrounds; red artwork preserved"
+  }
+]
