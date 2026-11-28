@@ -21,7 +21,7 @@ python -m http.server 4173
 | `brand` / `meta` | 品牌名称、页面标题、描述与语言 |
 | `copy` | 导航、轮播、各内容区块、页尾及表单文案 |
 | `media` | Logo、轮播、产品、技术图及背景图地址 |
-| `products` / `categories` | 商品信息、价格、图片引用及分类名称 |
+| `products` / `categories` / `featuredProducts` | 商品信息、分类名称与首页推荐商品 ID |
 | `ui` / `info` | 按钮、交互提示、无障碍标签及说明弹窗 |
 | `promotion` / `technology` | 活动截止时间、结束文案及技术切换图片 |
 | `links` / `format` | 品牌外链、金额显示语言与币种 |
@@ -29,6 +29,8 @@ python -m http.server 4173
 图片地址支持相对路径和 HTTP(S) URL；本地素材放在 `assets/`。`products[].image` 和 `technology.images[].image` 引用 `media` 中的键名。图片替代文字由对应区块、技术配置和 `ui.product.imageAlt` 管理。
 
 文案中的 `{brand}` 自动引用 `brand.name`；`{name}`、`{count}` 等占位符由交互提供，修改时请保留。商品 `id` 和分类键应保持稳定，以兼容已有购物车、收藏和导航。页面结构与样式分别由 `index.html` 和 `styles.css` 维护。
+
+`products` 中的 `summary`、`specifications` 和 `features` 管理商品摘要、规格与功能。未提供售价及评分时设为 `null`，页面展示详情入口，不显示虚构价格或评分，也不加入购物车。
 
 ## 部署
 

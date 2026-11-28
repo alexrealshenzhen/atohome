@@ -165,5 +165,29 @@
     "source": "User-provided PDF: Atohome-转曲.pdf",
     "local": "assets/atohome-logo-light.svg",
     "variant": "Black lettering changed to white for dark backgrounds; red artwork preserved"
+  },
+  {
+    "name": "jh02",
+    "source": "User-supplied product photography",
+    "local": "assets/jh02.webp",
+    "specifications_source": "User-supplied four-model product specification document"
+  },
+  {
+    "name": "jh05",
+    "source": "User-supplied product photography",
+    "local": "assets/jh05.webp",
+    "specifications_source": "User-supplied four-model product specification document"
+  },
+  {
+    "name": "jh06",
+    "source": "User-supplied product photography",
+    "local": "assets/jh06.webp",
+    "specifications_source": "User-supplied four-model product specification document"
+  },
+  {
+    "name": "jh08",
+    "source": "User-supplied product photography",
+    "local": "assets/jh08.webp",
+    "specifications_source": "User-supplied four-model product specification document"
   }
 ]

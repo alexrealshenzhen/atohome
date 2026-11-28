@@ -46,7 +46,11 @@ window.SITE_CONFIG = {
     "techFilter": "assets/tech-filter.webp",
     "techQuiet": "assets/tech-quiet.webp",
     "techSmart": "assets/tech-smart.webp",
-    "techVacuum": "assets/tech-vacuum.webp"
+    "techVacuum": "assets/tech-vacuum.webp",
+    "jh02": "assets/jh02.webp",
+    "jh05": "assets/jh05.webp",
+    "jh06": "assets/jh06.webp",
+    "jh08": "assets/jh08.webp"
   },
   "categories": {
     "all": "Shop All",
@@ -57,7 +61,250 @@ window.SITE_CONFIG = {
     "filters": "Filters & Accessories",
     "favorites": "Your Favorites"
   },
+  "featuredProducts": [
+    "jh02",
+    "jh05",
+    "jh06",
+    "jh08"
+  ],
   "products": [
+    {
+      "id": "jh02",
+      "name": "JH02 Air Purifier",
+      "category": "air",
+      "image": "jh02",
+      "price": null,
+      "regular": null,
+      "rating": null,
+      "reviews": null,
+      "badge": "100 m³/h CADR",
+      "summary": "20–35 m² · Three airflow modes",
+      "description": "Designed for everyday air care in 20–35 m² rooms, the JH02 combines a CADR of 100 m³/h with three selectable airflow modes and flexible timer settings.",
+      "specifications": [
+        {
+          "label": "CADR",
+          "value": "100 m³/h"
+        },
+        {
+          "label": "Applicable area",
+          "value": "20–35 m²"
+        },
+        {
+          "label": "Rated voltage",
+          "value": "AC 220–240 V, 50 Hz"
+        },
+        {
+          "label": "Maximum power",
+          "value": "35 W"
+        },
+        {
+          "label": "Product dimensions",
+          "value": "330 × 180 × 560 mm"
+        },
+        {
+          "label": "Net weight",
+          "value": "2.78 kg"
+        },
+        {
+          "label": "Package dimensions",
+          "value": "370 × 215 × 605 mm"
+        },
+        {
+          "label": "Gross weight",
+          "value": "3.3 kg"
+        }
+      ],
+      "features": [
+        "Sleep mode for slower airflow; Purify mode for medium airflow; Smoke Free mode for high airflow.",
+        "Timer options: 1, 2, 8 or 12 hours.",
+        "Negative-ion function is optional."
+      ]
+    },
+    {
+      "id": "jh05",
+      "name": "JH05 Air Purifier",
+      "category": "air",
+      "image": "jh05",
+      "price": null,
+      "regular": null,
+      "rating": null,
+      "reviews": null,
+      "badge": "150 m³/h CADR",
+      "summary": "30–50 m² · H11 HEPA filtration",
+      "description": "The JH05 pairs a CADR of 150 m³/h with three-stage pre-filter, H11 HEPA and activated-carbon filtration. Air-quality monitoring and a temperature display help you keep track of the room.",
+      "specifications": [
+        {
+          "label": "CADR",
+          "value": "150 m³/h"
+        },
+        {
+          "label": "Applicable area",
+          "value": "30–50 m²"
+        },
+        {
+          "label": "Rated voltage",
+          "value": "AC 220–240 V, 50 Hz"
+        },
+        {
+          "label": "Maximum power",
+          "value": "≤35 W"
+        },
+        {
+          "label": "Color",
+          "value": "White"
+        },
+        {
+          "label": "Product dimensions",
+          "value": "330 × 180 × 560 mm"
+        },
+        {
+          "label": "Net weight",
+          "value": "3 kg"
+        },
+        {
+          "label": "Package dimensions",
+          "value": "370 × 215 × 605 mm"
+        },
+        {
+          "label": "Gross weight",
+          "value": "3.52 kg"
+        }
+      ],
+      "features": [
+        "Three-stage pre-filter, H11 HEPA and activated-carbon filtration.",
+        "Sleep, middle and high fan speeds.",
+        "Timer: 1–8 hours.",
+        "Filter-replacement reminder after 2,000 hours.",
+        "Real-time air-quality monitoring and temperature display.",
+        "Negative-ion and UV functions are optional."
+      ]
+    },
+    {
+      "id": "jh06",
+      "name": "JH06 Air Purifier",
+      "category": "air",
+      "image": "jh06",
+      "price": null,
+      "regular": null,
+      "rating": null,
+      "reviews": null,
+      "badge": "300 m³/h CADR",
+      "summary": "30–50 m² · PM2.5 monitoring",
+      "description": "With a CADR of 300 m³/h, the JH06 brings H11 HEPA filtration and real-time PM2.5 monitoring to 30–50 m² rooms. Three fan speeds, a temperature display and timed operation provide everyday control.",
+      "specifications": [
+        {
+          "label": "CADR",
+          "value": "300 m³/h"
+        },
+        {
+          "label": "Applicable area",
+          "value": "30–50 m²"
+        },
+        {
+          "label": "Rated voltage",
+          "value": "AC 220–240 V, 50 Hz"
+        },
+        {
+          "label": "Maximum power",
+          "value": "≤40 W"
+        },
+        {
+          "label": "Maximum noise",
+          "value": "≤35 dB"
+        },
+        {
+          "label": "Material / color",
+          "value": "ABS / white"
+        },
+        {
+          "label": "Product dimensions",
+          "value": "330 × 200 × 630 mm"
+        },
+        {
+          "label": "Net weight",
+          "value": "4.5 kg"
+        },
+        {
+          "label": "Package dimensions",
+          "value": "375 × 238 × 670 mm"
+        },
+        {
+          "label": "Gross weight",
+          "value": "5.1 kg"
+        }
+      ],
+      "features": [
+        "Three-stage pre-filter, H11 HEPA and activated-carbon filtration.",
+        "Sleep, middle and high fan speeds.",
+        "Timer: 1–8 hours.",
+        "Real-time PM2.5 monitoring and temperature display.",
+        "Filter-replacement reminder after 2,000 hours.",
+        "Negative-ion function included; UV function optional."
+      ]
+    },
+    {
+      "id": "jh08",
+      "name": "JH08 Air Purifier",
+      "category": "air",
+      "image": "jh08",
+      "price": null,
+      "regular": null,
+      "rating": null,
+      "reviews": null,
+      "badge": "160 m³/h CADR",
+      "summary": "40–50 m² · H11 HEPA filtration",
+      "description": "The JH08 combines a CADR of 160 m³/h with three-stage H11 HEPA filtration for 40–50 m² rooms. Real-time PM2.5 monitoring, a temperature display and three fan speeds keep room air care easy to manage.",
+      "specifications": [
+        {
+          "label": "CADR",
+          "value": "160 m³/h"
+        },
+        {
+          "label": "Applicable area",
+          "value": "40–50 m²"
+        },
+        {
+          "label": "Rated voltage",
+          "value": "220–240 V"
+        },
+        {
+          "label": "Maximum power",
+          "value": "≤35 W"
+        },
+        {
+          "label": "Maximum noise",
+          "value": "≤35 dB"
+        },
+        {
+          "label": "Material / color",
+          "value": "ABS / white"
+        },
+        {
+          "label": "Product dimensions",
+          "value": "330 × 200 × 515 mm"
+        },
+        {
+          "label": "Net weight",
+          "value": "3.8 kg"
+        },
+        {
+          "label": "Package dimensions",
+          "value": "375 × 238 × 565 mm"
+        },
+        {
+          "label": "Gross weight",
+          "value": "4.7 kg"
+        }
+      ],
+      "features": [
+        "Three-stage pre-filter, H11 HEPA and activated-carbon filtration.",
+        "Sleep, middle and high fan speeds.",
+        "Timer: 1–8 hours.",
+        "Real-time PM2.5 monitoring and temperature display.",
+        "Filter-replacement reminder after 2,000 hours.",
+        "Negative-ion and UV functions are optional."
+      ]
+    },
     {
       "id": "vital-200s",
       "name": "Vital 200S-P Smart Air Purifier",
@@ -68,7 +315,10 @@ window.SITE_CONFIG = {
       "rating": "4.8",
       "reviews": "2,640",
       "badge": "Bestseller",
-      "description": "A fresh start for pet-friendly homes. The Vital 200S-P captures pet hair, dander, and everyday airborne particles, with smart control that makes cleaner air feel effortless."
+      "description": "A fresh start for pet-friendly homes. The Vital 200S-P captures pet hair, dander, and everyday airborne particles, with smart control that makes cleaner air feel effortless.",
+      "summary": "",
+      "specifications": [],
+      "features": []
     },
     {
       "id": "lvac-200",
@@ -80,7 +330,10 @@ window.SITE_CONFIG = {
       "rating": "4.7",
       "reviews": "1,820",
       "badge": "Save $60",
-      "description": "Lightweight, powerful, and ready for real life. Make quick work of everyday crumbs and pet hair with cordless freedom, versatile attachments, and an easy-empty dustbin."
+      "description": "Lightweight, powerful, and ready for real life. Make quick work of everyday crumbs and pet hair with cordless freedom, versatile attachments, and an easy-empty dustbin.",
+      "summary": "",
+      "specifications": [],
+      "features": []
     },
     {
       "id": "core-300",
@@ -92,7 +345,10 @@ window.SITE_CONFIG = {
       "rating": "4.8",
       "reviews": "3,210",
       "badge": "Fan Favorite",
-      "description": "Your everyday clean-air companion. A compact design and whisper-quiet operation bring fresh air to bedrooms, home offices, and the spaces you love most."
+      "description": "Your everyday clean-air companion. A compact design and whisper-quiet operation bring fresh air to bedrooms, home offices, and the spaces you love most.",
+      "summary": "",
+      "specifications": [],
+      "features": []
     },
     {
       "id": "core-mini",
@@ -104,7 +360,10 @@ window.SITE_CONFIG = {
       "rating": "4.7",
       "reviews": "1,960",
       "badge": "Small & Mighty",
-      "description": "Big comfort for little spaces. This personal air purifier fits right into your nightstand or workspace, with simple controls and a compact footprint."
+      "description": "Big comfort for little spaces. This personal air purifier fits right into your nightstand or workspace, with simple controls and a compact footprint.",
+      "summary": "",
+      "specifications": [],
+      "features": []
     },
     {
       "id": "lv600s",
@@ -116,7 +375,10 @@ window.SITE_CONFIG = {
       "rating": "4.6",
       "reviews": "1,140",
       "badge": "Winter Essential",
-      "description": "Find your ideal balance with warm and cool mist, smart humidity control, and a generous water tank. A simple way to make dry days a little more comfortable."
+      "description": "Find your ideal balance with warm and cool mist, smart humidity control, and a generous water tank. A simple way to make dry days a little more comfortable.",
+      "summary": "",
+      "specifications": [],
+      "features": []
     },
     {
       "id": "superior-studio",
@@ -128,7 +390,10 @@ window.SITE_CONFIG = {
       "rating": "4.8",
       "reviews": "324",
       "badge": "New Arrival",
-      "description": "Meet natural humidification, made smart. Evaporative technology helps balance dry air without visible mist or white dust, in a design that feels at home anywhere."
+      "description": "Meet natural humidification, made smart. Evaporative technology helps balance dry air without visible mist or white dust, in a design that feels at home anywhere.",
+      "summary": "",
+      "specifications": [],
+      "features": []
     },
     {
       "id": "windi-mini",
@@ -140,7 +405,10 @@ window.SITE_CONFIG = {
       "rating": "4.7",
       "reviews": "286",
       "badge": "A Fresh Breeze",
-      "description": "Your perfect little breeze, wherever the day takes you. A portable desk companion with a compact design and easy controls for personalized comfort."
+      "description": "Your perfect little breeze, wherever the day takes you. A portable desk companion with a compact design and easy controls for personalized comfort.",
+      "summary": "",
+      "specifications": [],
+      "features": []
     },
     {
       "id": "eleva-filter",
@@ -152,7 +420,10 @@ window.SITE_CONFIG = {
       "rating": "4.9",
       "reviews": "168",
       "badge": "Genuine {brand}",
-      "description": "Keep your fresh-air routine going. A genuine {brand} replacement filter designed for the Eleva 300X, with a snug fit and straightforward installation."
+      "description": "Keep your fresh-air routine going. A genuine {brand} replacement filter designed for the Eleva 300X, with a snug fit and straightforward installation.",
+      "summary": "",
+      "specifications": [],
+      "features": []
     },
     {
       "id": "eleva-300x",
@@ -164,7 +435,10 @@ window.SITE_CONFIG = {
       "rating": "4.8",
       "reviews": "426",
       "badge": "Smart Comfort",
-      "description": "Thoughtful air care for your everyday. Advanced filtration and smart sensing come together in a refined design, giving your home a little more peace of mind."
+      "description": "Thoughtful air care for your everyday. Advanced filtration and smart sensing come together in a refined design, giving your home a little more peace of mind.",
+      "summary": "",
+      "specifications": [],
+      "features": []
     },
     {
       "id": "vortexiq-pro",
@@ -176,7 +450,10 @@ window.SITE_CONFIG = {
       "rating": "4.7",
       "reviews": "392",
       "badge": "Powerfully Simple",
-      "description": "From the first crumb to the last corner, enjoy powerful cordless cleaning with a versatile design that moves easily between floors and everyday messes."
+      "description": "From the first crumb to the last corner, enjoy powerful cordless cleaning with a versatile design that moves easily between floors and everyday messes.",
+      "summary": "",
+      "specifications": [],
+      "features": []
     }
   ],
   "promotion": {
@@ -278,7 +555,10 @@ window.SITE_CONFIG = {
       "add": "Add to Bag",
       "addLabel": "Add {name} to bag",
       "detailRating": " {rating} · {reviews} reviews",
-      "benefits": " Free shipping · 2-year warranty · 30-day returns"
+      "benefits": " Free shipping · 2-year warranty · 30-day returns",
+      "details": "View Details",
+      "specifications": "Specifications",
+      "features": "Features"
     },
     "shop": {
       "oneResult": "{count} product",

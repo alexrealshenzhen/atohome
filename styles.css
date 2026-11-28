@@ -205,6 +205,8 @@ p{line-height:1.5}
 .product-card-copy{padding:15px 20px 20px;display:flex;flex:1;flex-direction:column;align-items:flex-start}
 .product-rating{font-size:10px;letter-spacing:2px;color:#946f25;margin-bottom:10px}.product-rating span{color:#657389;letter-spacing:0;margin-left:5px}
 .product-title{font-size:18px;line-height:1.3;letter-spacing:-.4px;text-align:left;font-weight:600;padding:0;margin-bottom:13px;min-height:47px}
+.product-badge-specs{text-transform:none}
+.product-summary{font-size:13px;line-height:1.5;color:var(--muted);margin:-3px 0 0;min-height:40px}
 .product-prices{display:flex;align-items:center;gap:10px;font-size:18px;font-weight:600;margin-top:auto;flex-wrap:wrap}
 .product-prices del{color:#6e8196;font-size:14px;font-weight:400}
 .quick-add{margin-top:18px;border-top:1px solid #e3eaf0;padding:13px 0 0;width:100%;display:flex;justify-content:space-between;align-items:center;font-size:13px;font-weight:600;color:#23425b;text-align:left}
@@ -257,6 +259,12 @@ dialog[open]{animation:dialog-in .25s ease both}
 .detail-image img{width:100%;aspect-ratio:1;object-fit:contain;mix-blend-mode:multiply}
 .detail-copy{padding:65px 35px 40px}.detail-copy h2{font-size:33px;line-height:1.17;margin:15px 0 20px;letter-spacing:-1px}
 .detail-copy .product-rating{font-size:13px}.detail-copy>.detail-description{font-size:15px;color:var(--muted);line-height:1.6;margin:22px 0}
+.detail-layout-specs .detail-image{align-items:flex-start}
+.product-information{margin-top:26px;padding-top:23px;border-top:1px solid var(--line)}
+.product-information h3{font-size:16px;line-height:1.4;margin-bottom:12px}
+.product-information dl>div{display:grid;grid-template-columns:minmax(110px,1fr) 1.2fr;gap:12px;padding:8px 0;border-bottom:1px solid #e8eef3;font-size:12px;line-height:1.5}
+.product-information dt{color:var(--muted)}.product-information dd{margin:0;overflow-wrap:anywhere}
+.product-information ul{padding-left:18px;font-size:13px;line-height:1.65;color:var(--muted)}.product-information li+li{margin-top:7px}
 .detail-copy>.product-prices{font-size:26px;margin:25px 0}.detail-copy .button{width:100%}.detail-copy>.detail-features{font-size:12px;color:var(--muted);margin-top:20px;display:flex;align-items:center;gap:8px}
 .cart-dialog{margin:0 0 0 auto;height:100dvh;max-height:100dvh;width:min(470px,100%);border-radius:24px 0 0 24px;padding:28px;flex-direction:column}
 .cart-dialog[open]{display:flex;animation:drawer-in .28s ease both}

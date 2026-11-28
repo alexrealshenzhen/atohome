@@ -56,11 +56,18 @@ function applyConfiguration() {
     ids.add(product.id);
     if (typeof configured(`categories.${product.category}`) !== 'string') configurationError(`Invalid category for "${product.id}"`);
     imageUrl(product.image);
-    for (const field of ['name', 'badge', 'description', 'rating', 'reviews']) {
+    for (const field of ['name', 'badge', 'description', 'summary']) {
       if (typeof product[field] !== 'string') configurationError(`Invalid product text "${product.id}.${field}"`);
     }
-    if (![product.price, product.regular].every(value => typeof value === 'number' && Number.isFinite(value) && value >= 0)) configurationError(`Invalid price for "${product.id}"`);
+    const validPrices = [product.price, product.regular].every(value => value === null || (typeof value === 'number' && Number.isFinite(value) && value >= 0));
+    if (!validPrices || (product.price === null && product.regular !== null)) configurationError(`Invalid price for "${product.id}"`);
+    const validRating = (product.rating === null && product.reviews === null) || [product.rating, product.reviews].every(value => typeof value === 'string');
+    if (!validRating) configurationError(`Invalid rating for "${product.id}"`);
+    if (!Array.isArray(product.specifications) || !product.specifications.every(row => typeof row.label === 'string' && typeof row.value === 'string')) configurationError(`Invalid specifications for "${product.id}"`);
+    if (!Array.isArray(product.features) || !product.features.every(value => typeof value === 'string')) configurationError(`Invalid features for "${product.id}"`);
   }
+  const featured = configured('featuredProducts');
+  if (!Array.isArray(featured) || !featured.length || new Set(featured).size !== featured.length || !featured.every(id => ids.has(id))) configurationError('featuredProducts must reference unique existing product IDs');
   const comments = [];
   const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_COMMENT);
   while (walker.nextNode()) if (walker.currentNode.nodeValue.startsWith('copy:')) comments.push(walker.currentNode);
@@ -78,7 +85,7 @@ function applyConfiguration() {
 }
 
 applyConfiguration();
-const products = configured('products').map(product => ({ ...product, name: formatCopy(product.name), badge: formatCopy(product.badge), description: formatCopy(product.description) }));
+const products = configured('products').map(product => ({ ...product, name: formatCopy(product.name), badge: formatCopy(product.badge), description: formatCopy(product.description), summary: formatCopy(product.summary) }));
 const categoryNames = Object.fromEntries(Object.entries(configured('categories')).map(([key, label]) => [key, formatCopy(label)]));
 const productById = new Map(products.map(product => [product.id, product]));
 const storageKey = 'atohome-storefront-preview-v1';
@@ -113,7 +120,7 @@ function restoreState() {
     if (!Array.isArray(saved.cart) || !Array.isArray(saved.favorites)) throw new Error('Invalid saved storefront data');
     const ids = new Set();
     state.cart = saved.cart.filter(row => {
-      if (!row || !productById.has(row.id) || ids.has(row.id) || !Number.isInteger(row.quantity) || row.quantity < 1 || row.quantity > 99) return false;
+      if (!row || !isPurchasable(productById.get(row.id)) || ids.has(row.id) || !Number.isInteger(row.quantity) || row.quantity < 1 || row.quantity > 99) return false;
       ids.add(row.id);
       return true;
     }).map(({ id, quantity }) => ({ id, quantity }));
@@ -135,19 +142,38 @@ function persistState() {
   return true;
 }
 
+function isPurchasable(product) {
+  return Number.isFinite(product?.price);
+}
+
+function productPrices(product) {
+  if (!isPurchasable(product)) return '';
+  const regular = product.regular === null ? '' : `<del>${money(product.regular)}</del>`;
+  return `<p class="product-prices">${money(product.price)} ${regular}</p>`;
+}
+
+function productInformation(product) {
+  const specifications = product.specifications.length ? `<section class="product-information"><h3>${escapeHtml(text('ui.product.specifications'))}</h3><dl>${product.specifications.map(row => `<div><dt>${escapeHtml(formatCopy(row.label))}</dt><dd>${escapeHtml(formatCopy(row.value))}</dd></div>`).join('')}</dl></section>` : '';
+  const features = product.features.length ? `<section class="product-information"><h3>${escapeHtml(text('ui.product.features'))}</h3><ul>${product.features.map(value => `<li>${escapeHtml(formatCopy(value))}</li>`).join('')}</ul></section>` : '';
+  return specifications + features;
+}
+
 function productCard(product) {
   const favorite = state.favorites.includes(product.id);
   const values = { name: product.name, rating: product.rating, reviews: product.reviews };
+  const rating = product.rating === null ? '' : `<p class="product-rating"><span class="sr-only">${escapeHtml(text('ui.product.ratingLabel', values))}</span><span aria-hidden="true">${escapeHtml(text('ui.product.stars'))}</span><span>${escapeHtml(text('ui.product.ratingSummary', values))}</span></p>`;
+  const summary = product.summary ? `<p class="product-summary">${escapeHtml(product.summary)}</p>` : '';
+  const action = isPurchasable(product) ? `data-add="${escapeHtml(product.id)}" aria-label="${escapeHtml(text('ui.product.addLabel', values))}"` : `data-product="${escapeHtml(product.id)}" aria-label="${escapeHtml(text('ui.product.view', values))}"`;
   return `<article class="product-card">
-    <span class="product-badge">${escapeHtml(product.badge)}</span>
+    <span class="product-badge${product.specifications.length ? ' product-badge-specs' : ''}">${escapeHtml(product.badge)}</span>
     <button class="icon-button favorite-button" data-favorite="${escapeHtml(product.id)}" aria-label="${escapeHtml(text(favorite ? 'ui.product.favoriteRemove' : 'ui.product.favoriteAdd', values))}" aria-pressed="${favorite}">${icon('heart')}</button>
     <button class="product-image-button" data-product="${escapeHtml(product.id)}" aria-label="${escapeHtml(text('ui.product.view', values))}"><img src="${escapeHtml(imageUrl(product.image))}" alt="${escapeHtml(text('ui.product.imageAlt', values))}" width="600" height="600" loading="lazy"></button>
-    <div class="product-card-copy"><p class="product-rating"><span class="sr-only">${escapeHtml(text('ui.product.ratingLabel', values))}</span><span aria-hidden="true">${escapeHtml(text('ui.product.stars'))}</span><span>${escapeHtml(text('ui.product.ratingSummary', values))}</span></p><button class="product-title" data-product="${escapeHtml(product.id)}">${escapeHtml(product.name)}</button><p class="product-prices">${money(product.price)} <del>${money(product.regular)}</del></p><button class="quick-add" data-add="${escapeHtml(product.id)}" aria-label="${escapeHtml(text('ui.product.addLabel', values))}">${escapeHtml(text('ui.product.add'))} ${icon('plus')}</button></div>
+    <div class="product-card-copy">${rating}<button class="product-title" data-product="${escapeHtml(product.id)}">${escapeHtml(product.name)}</button>${summary}${productPrices(product)}<button class="quick-add" ${action}>${escapeHtml(text(isPurchasable(product) ? 'ui.product.add' : 'ui.product.details'))} ${icon(isPurchasable(product) ? 'plus' : 'arrow')}</button></div>
   </article>`;
 }
 
 function renderTrending() {
-  document.querySelector('#trending-products').innerHTML = products.slice(0, 4).map(productCard).join('');
+  document.querySelector('#trending-products').innerHTML = configured('featuredProducts').map(id => productById.get(id)).map(productCard).join('');
 }
 
 function renderShop() {
@@ -191,7 +217,12 @@ function openProduct(id) {
   const product = productById.get(id);
   if (!product) return;
   const values = { name: product.name, rating: product.rating, reviews: product.reviews };
-  document.querySelector('#product-detail').innerHTML = `<div class="detail-layout"><div class="detail-image"><img src="${escapeHtml(imageUrl(product.image))}" alt="${escapeHtml(text('ui.product.imageAlt', values))}" width="600" height="600"></div><div class="detail-copy"><span class="section-kicker">${escapeHtml(product.badge.toUpperCase())}</span><h2 id="detail-title">${escapeHtml(product.name)}</h2><p class="product-rating"><span aria-hidden="true">${escapeHtml(text('ui.product.stars'))}</span><span>${escapeHtml(text('ui.product.detailRating', values))}</span></p><p class="detail-description">${escapeHtml(product.description)}</p><p class="product-prices">${money(product.price)} <del>${money(product.regular)}</del></p><button class="button button-primary" data-add="${escapeHtml(product.id)}">${escapeHtml(text('ui.product.add'))} ${icon('bag')}</button><p class="detail-features">${icon('shield')}${escapeHtml(text('ui.product.benefits'))}</p></div></div>`;
+  const rating = product.rating === null ? '' : `<p class="product-rating"><span aria-hidden="true">${escapeHtml(text('ui.product.stars'))}</span><span>${escapeHtml(text('ui.product.detailRating', values))}</span></p>`;
+  const purchase = isPurchasable(product) ? `<button class="button button-primary" data-add="${escapeHtml(product.id)}">${escapeHtml(text('ui.product.add'))} ${icon('bag')}</button><p class="detail-features">${icon('shield')}${escapeHtml(text('ui.product.benefits'))}</p>` : '';
+  const layout = product.specifications.length ? 'detail-layout detail-layout-specs' : 'detail-layout';
+  const badgeClass = product.specifications.length ? 'section-kicker product-badge-specs' : 'section-kicker';
+  const badge = product.specifications.length ? product.badge : product.badge.toUpperCase();
+  document.querySelector('#product-detail').innerHTML = `<div class="${layout}"><div class="detail-image"><img src="${escapeHtml(imageUrl(product.image))}" alt="${escapeHtml(text('ui.product.imageAlt', values))}" width="600" height="600"></div><div class="detail-copy"><span class="${badgeClass}">${escapeHtml(badge)}</span><h2 id="detail-title">${escapeHtml(product.name)}</h2>${rating}<p class="detail-description">${escapeHtml(product.description)}</p>${productPrices(product)}${purchase}${productInformation(product)}</div></div>`;
   productDialog.setAttribute('aria-labelledby', 'detail-title');
   productDialog.showModal();
 }
@@ -212,6 +243,7 @@ function updateBagCount() {
 function addToCart(id) {
   const product = productById.get(id);
   if (!product) return;
+  if (!isPurchasable(product)) return openProduct(id);
   const row = state.cart.find(item => item.id === id);
   if (row && row.quantity === 99) {
     showToast(text('ui.feedback.quantityLimit', { limit: 99 }));
