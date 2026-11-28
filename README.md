@@ -25,6 +25,7 @@ python -m http.server 4173
 | `ui` / `info` | 按钮、交互提示、无障碍标签及说明弹窗 |
 | `promotion` / `technology` | 活动截止时间、结束文案及技术切换图片 |
 | `links` / `format` | 品牌外链、金额显示语言与币种 |
+| `newsletter` | Google Apps Script 订阅地址、超时时间与联系邮箱 |
 
 图片地址支持相对路径和 HTTP(S) URL；本地素材放在 `assets/`。`products[].image` 和 `technology.images[].image` 引用 `media` 中的键名。图片替代文字由对应区块、技术配置和 `ui.product.imageAlt` 管理。
 
@@ -40,6 +41,8 @@ python -m http.server 4173
 
 ## 使用边界
 
-本站为前端展示与交互演示，未接入账号、支付或邮件订阅服务。购物车与收藏仅保存在当前浏览器。
+本站未接入账号或支付服务。购物车与收藏仅保存在当前浏览器。
+
+邮件订阅将邮箱保存到 `info.atohome@gmail.com` 的 Google 通讯录，并加入 `atohome Subscribers` 标签。两个入口共用流程，只有 Google 脚本确认保存后才显示成功。部署步骤与名单管理见 [Gmail 订阅接入](google-apps-script/README.md)。未配置 `newsletter.endpoint` 时订阅明确未开放；无需邮箱密码、SMTP、数据库或独立服务器。后续邮件由运营人员在 Gmail 发送，退订请求通过联系邮箱人工处理。
 
 素材来源记录于 `assets/asset-sources.json`。品牌、字体和图片权利归原权利人，商用前须确认授权。

@@ -6,6 +6,11 @@ window.SITE_CONFIG = {
   "brand": {
     "name": "atohome"
   },
+  "newsletter": {
+    "endpoint": "",
+    "timeoutMs": 25000,
+    "contactEmail": "info.atohome@gmail.com"
+  },
   "meta": {
     "language": "en",
     "title": "{brand} — A Little More Comfort, Every Day",
@@ -519,11 +524,11 @@ window.SITE_CONFIG = {
     },
     "privacy": {
       "title": "Your privacy matters.",
-      "copy": "This independent preview has no analytics or tracking scripts. Your shopping bag and favorites are stored only in this browser. Email addresses are not collected or submitted. Links to official sites open those sites with their own privacy policies."
+      "copy": "Your shopping bag and favorites stay in this browser. When email subscriptions are available and you subscribe, your email is stored in the Google Contacts of {contactEmail} under the atohome Subscribers label, so we can share product news and offers. We do not save your email in browser storage. Google processes the subscription request. To unsubscribe or request removal, email {contactEmail}."
     },
     "terms": {
       "title": "About this storefront preview.",
-      "copy": "This is an independent recreation of the {brand} homepage for demonstration. Brand names, product images, and reference copy belong to their respective owners. Product prices, ratings, and availability are illustrative and may change. No purchases, accounts, or email subscriptions are processed here."
+      "copy": "This storefront does not process purchases or accounts. Product prices, ratings, and availability shown in the preview are illustrative. Subscribing, when available, gives {brand} permission to save your email as a Google contact and send product news and offers. You can unsubscribe by emailing {contactEmail}."
     }
   },
   "links": {
@@ -586,8 +591,25 @@ window.SITE_CONFIG = {
       "quantityLimit": "You can add up to {limit} of each item.",
       "added": "{name} added to your bag",
       "favoriteRemoved": "Removed from your favorites.",
-      "favoriteSaved": "Saved to your favorites. Find it under View All → Favorites.",
-      "subscription": "This is a storefront preview. Your email has not been collected or submitted."
+      "favoriteSaved": "Saved to your favorites. Find it under View All → Favorites."
+    },
+    "newsletter": {
+      "consent": "Email me product news and offers from {brand}. I can unsubscribe anytime.",
+      "submitting": "Subscribing…",
+      "sending": "Saving your subscription…",
+      "success": "You're subscribed. Thank you for joining {brand}.",
+      "invalid": "Enter a valid email address, such as name@example.com.",
+      "consentRequired": "Please agree to receive email updates before subscribing.",
+      "unavailable": "Email subscriptions are not available yet. Please check back soon.",
+      "failed": "We couldn't save your subscription. Please try again.",
+      "rateLimited": "Too many requests. Please wait a minute and try again.",
+      "dailyLimit": "Email subscriptions have reached today's limit. Please try again tomorrow.",
+      "busy": "Subscriptions are busy right now. Please try again shortly.",
+      "timeout": "We couldn't confirm whether your subscription was saved. Please try again in a minute.",
+      "secureContext": "Open the website over HTTPS to subscribe.",
+      "honeypot": "Leave this field empty",
+      "unsubscribe": "To unsubscribe, email ",
+      "frameTitle": "Subscription response"
     },
     "slideshow": {
       "playLabel": "Play slideshow",

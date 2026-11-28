@@ -42,6 +42,7 @@ function imageUrl(key) {
 function applyConfiguration() {
   if (!config || typeof config !== 'object') configurationError('site.config.js must define window.SITE_CONFIG');
   templateValues.brand = configured('brand.name');
+  templateValues.contactEmail = configured('newsletter.contactEmail');
   templateValues.slideCount = String(document.querySelectorAll('.hero-slide').length).padStart(2, '0');
   for (const [key, value] of Object.entries(configured('media'))) {
     if (typeof value !== 'string' || !value.trim()) configurationError(`Invalid image "media.${key}"`);
@@ -78,6 +79,7 @@ function applyConfiguration() {
       const name = attribute.name.slice('data-config-'.length);
       const value = name === 'image' ? imageUrl(configured(attribute.value)) : text(attribute.value);
       if (name === 'text') element.textContent = value;
+      else if (name === 'mailto') element.setAttribute('href', `mailto:${value}`);
       else element.setAttribute(name === 'image' ? 'src' : name, value);
     }
   }
@@ -359,11 +361,126 @@ shopDialog.setAttribute('aria-labelledby', 'shop-title');
 cartDialog.setAttribute('aria-label', text('ui.cart.dialogLabel'));
 infoDialog.setAttribute('aria-labelledby', 'info-title');
 
-document.querySelectorAll('.newsletter-form').forEach(form => form.addEventListener('submit', event => {
-  event.preventDefault();
-  const feedback = form.parentElement.querySelector('.form-feedback');
-  feedback.textContent = text('ui.feedback.subscription');
-}));
+const newsletterForms = [...document.querySelectorAll('[data-newsletter]')];
+let newsletterPending = null;
+
+function newsletterFeedback(form, key, error = false) {
+  const feedback = document.getElementById(form.elements.email.getAttribute('aria-describedby'));
+  feedback.textContent = key ? text(`ui.newsletter.${key}`) : '';
+  feedback.dataset.state = error ? 'error' : 'notice';
+}
+
+function newsletterEndpoint() {
+  const value = configured('newsletter.endpoint');
+  if (!value) return null;
+  try {
+    const url = new URL(value);
+    if (url.origin === 'https://script.google.com' && /^\/macros\/s\/[a-zA-Z0-9_-]+\/exec$/.test(url.pathname) && !url.search && !url.hash) return url.href;
+  } catch { /* Invalid configuration disables this form explicitly. */ }
+  return null;
+}
+
+function finishNewsletter(code) {
+  const pending = newsletterPending;
+  if (!pending) return;
+  newsletterPending = null;
+  clearTimeout(pending.timer);
+  pending.frame.remove();
+  pending.form.removeAttribute('aria-busy');
+  for (const form of newsletterForms) {
+    const button = form.querySelector('button[type="submit"]');
+    button.disabled = false;
+    button.replaceChildren(...pending.labels.get(button));
+  }
+  pending.form.elements.email.readOnly = false;
+  pending.form.elements.consent.disabled = false;
+  const messages = {subscribed: 'success', invalid: 'invalid', rate_limited: 'rateLimited', daily_limit: 'dailyLimit', busy: 'busy', failed: 'failed', timeout: 'timeout'};
+  newsletterFeedback(pending.form, messages[code] || 'failed', code !== 'subscribed');
+  if (code === 'subscribed') pending.form.reset();
+}
+
+window.addEventListener('message', event => {
+  if (!newsletterPending || event.data?.type !== 'atohome-newsletter' || event.data.requestId !== newsletterPending.id) return;
+  let origin;
+  try { origin = new URL(event.origin); } catch { return; }
+  if (origin.protocol !== 'https:' || origin.port || !(origin.hostname === 'script.googleusercontent.com' || /^[a-z0-9-]+-script\.googleusercontent\.com$/.test(origin.hostname))) return;
+  if (!['subscribed', 'invalid', 'rate_limited', 'daily_limit', 'busy', 'failed'].includes(event.data.code)) return;
+  finishNewsletter(event.data.code);
+});
+
+for (const form of newsletterForms) {
+  if (!newsletterEndpoint()) {
+    newsletterFeedback(form, 'unavailable');
+    form.querySelector('button[type="submit"]').disabled = true;
+  }
+  form.elements.email.addEventListener('blur', () => {
+    if (!form.elements.email.value || newsletterPending) return;
+    const valid = form.elements.email.validity.valid;
+    form.elements.email.setAttribute('aria-invalid', String(!valid));
+    if (!valid) newsletterFeedback(form, 'invalid', true);
+  });
+  form.addEventListener('input', () => {
+    if (newsletterPending || !newsletterEndpoint()) return;
+    form.elements.email.removeAttribute('aria-invalid');
+    form.elements.consent.removeAttribute('aria-invalid');
+    newsletterFeedback(form, '');
+  });
+  form.addEventListener('submit', event => {
+    event.preventDefault();
+    if (newsletterPending) return;
+    const endpoint = newsletterEndpoint();
+    if (!endpoint) return newsletterFeedback(form, 'unavailable');
+    if (!['http:', 'https:'].includes(location.protocol) || !window.isSecureContext || !window.crypto?.getRandomValues) return newsletterFeedback(form, 'secureContext', true);
+    const input = form.elements.email;
+    input.value = input.value.trim();
+    if (!input.validity.valid) {
+      input.setAttribute('aria-invalid', 'true');
+      newsletterFeedback(form, 'invalid', true);
+      input.focus();
+      return;
+    }
+    if (!form.elements.consent.checked) {
+      form.elements.consent.setAttribute('aria-invalid', 'true');
+      newsletterFeedback(form, 'consentRequired', true);
+      form.elements.consent.focus();
+      return;
+    }
+    const id = [...crypto.getRandomValues(new Uint8Array(16))].map(value => value.toString(16).padStart(2, '0')).join('');
+    const frame = document.createElement('iframe');
+    frame.name = `newsletter-${id}`;
+    frame.title = text('ui.newsletter.frameTitle');
+    frame.hidden = true;
+    document.body.append(frame);
+    const transport = document.createElement('form');
+    transport.method = 'POST';
+    transport.action = endpoint;
+    transport.target = frame.name;
+    transport.hidden = true;
+    for (const [name, value] of Object.entries({email: input.value, source: form.dataset.newsletter, consent: 'yes', website: form.elements.website.value, origin: location.origin, requestId: id})) {
+      const field = document.createElement('input');
+      field.type = 'hidden';
+      field.name = name;
+      field.value = value;
+      transport.append(field);
+    }
+    const labels = new Map(newsletterForms.map(item => {
+      const button = item.querySelector('button[type="submit"]');
+      const original = [...button.childNodes].map(node => node.cloneNode(true));
+      button.disabled = true;
+      return [button, original];
+    }));
+    form.querySelector('button[type="submit"]').textContent = text('ui.newsletter.submitting');
+    form.setAttribute('aria-busy', 'true');
+    input.readOnly = true;
+    form.elements.consent.disabled = true;
+    newsletterFeedback(form, 'sending');
+    newsletterPending = {id, form, frame, labels, timer: setTimeout(() => finishNewsletter('timeout'), configured('newsletter.timeoutMs'))};
+    document.body.append(transport);
+    try { HTMLFormElement.prototype.submit.call(transport); }
+    catch { finishNewsletter('failed'); }
+    finally { transport.remove(); }
+  });
+}
 
 document.querySelector('#checkout-button').addEventListener('click', () => {
   document.querySelector('#checkout-note').hidden = false;
