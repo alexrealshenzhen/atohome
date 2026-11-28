@@ -1,19 +1,85 @@
 'use strict';
 
-const products = [
-  { id: 'vital-200s', name: 'Vital 200S-P Smart Air Purifier', category: 'air', image: 'product-vital', price: 159.99, regular: 189.99, rating: '4.8', reviews: '2,640', badge: 'Bestseller', description: 'A fresh start for pet-friendly homes. The Vital 200S-P captures pet hair, dander, and everyday airborne particles, with smart control that makes cleaner air feel effortless.' },
-  { id: 'lvac-200', name: 'LVAC-200 Cordless Vacuum Cleaner', category: 'vacuums', image: 'product-vacuum', price: 139.99, regular: 199.99, rating: '4.7', reviews: '1,820', badge: 'Save $60', description: 'Lightweight, powerful, and ready for real life. Make quick work of everyday crumbs and pet hair with cordless freedom, versatile attachments, and an easy-empty dustbin.' },
-  { id: 'core-300', name: 'Core® 300-P Air Purifier', category: 'air', image: 'product-core', price: 80.99, regular: 99.99, rating: '4.8', reviews: '3,210', badge: 'Fan Favorite', description: 'Your everyday clean-air companion. A compact design and whisper-quiet operation bring fresh air to bedrooms, home offices, and the spaces you love most.' },
-  { id: 'core-mini', name: 'Core® Mini-P Air Purifier', category: 'air', image: 'product-mini', price: 39.99, regular: 49.99, rating: '4.7', reviews: '1,960', badge: 'Small & Mighty', description: 'Big comfort for little spaces. This personal air purifier fits right into your nightstand or workspace, with simple controls and a compact footprint.' },
-  { id: 'lv600s', name: 'LV600S Smart Hybrid Humidifier', category: 'humidifiers', image: 'product-humidifier', price: 98.99, regular: 109.99, rating: '4.6', reviews: '1,140', badge: 'Winter Essential', description: 'Find your ideal balance with warm and cool mist, smart humidity control, and a generous water tank. A simple way to make dry days a little more comfortable.' },
-  { id: 'superior-studio', name: 'Superior® Studio Smart Humidifier', category: 'humidifiers', image: 'category-humidifier', price: 129.99, regular: 149.99, rating: '4.8', reviews: '324', badge: 'New Arrival', description: 'Meet natural humidification, made smart. Evaporative technology helps balance dry air without visible mist or white dust, in a design that feels at home anywhere.' },
-  { id: 'windi-mini', name: 'Windi Mini Portable Desk Fan', category: 'fans', image: 'category-fan', price: 39.99, regular: 49.99, rating: '4.7', reviews: '286', badge: 'A Fresh Breeze', description: 'Your perfect little breeze, wherever the day takes you. A portable desk companion with a compact design and easy controls for personalized comfort.' },
-  { id: 'eleva-filter', name: 'Eleva™ 300X Replacement Filter', category: 'filters', image: 'category-filter', price: 39.99, regular: 49.99, rating: '4.9', reviews: '168', badge: 'Genuine atohome', description: 'Keep your fresh-air routine going. A genuine atohome replacement filter designed for the Eleva 300X, with a snug fit and straightforward installation.' },
-  { id: 'eleva-300x', name: 'Eleva™ 300X Smart Air Purifier', category: 'air', image: 'category-air', price: 199.99, regular: 249.99, rating: '4.8', reviews: '426', badge: 'Smart Comfort', description: 'Thoughtful air care for your everyday. Advanced filtration and smart sensing come together in a refined design, giving your home a little more peace of mind.' },
-  { id: 'vortexiq-pro', name: 'VortexIQ® Pro Cordless Vacuum', category: 'vacuums', image: 'category-vacuum', price: 249.99, regular: 299.99, rating: '4.7', reviews: '392', badge: 'Powerfully Simple', description: 'From the first crumb to the last corner, enjoy powerful cordless cleaning with a versatile design that moves easily between floors and everyday messes.' },
-];
+const config = window.SITE_CONFIG;
+const templateValues = {};
 
-const categoryNames = { all: 'Shop All', air: 'Air Purifiers', vacuums: 'Vacuums', humidifiers: 'Humidifiers', fans: 'Fans', filters: 'Filters & Accessories', favorites: 'Your Favorites' };
+function configurationError(message) {
+  const notice = document.createElement('pre');
+  notice.setAttribute('role', 'alert');
+  notice.textContent = `Site configuration error: ${message}`;
+  document.body.replaceChildren(notice);
+  throw new Error(notice.textContent);
+}
+
+function configured(path) {
+  let value = config;
+  for (const part of path.split('.')) value = value?.[part];
+  if (value === undefined) configurationError(`Missing "${path}"`);
+  return value;
+}
+
+function formatCopy(value, values = {}) {
+  if (typeof value !== 'string') configurationError('Text values must be strings');
+  const variables = { ...templateValues, ...values };
+  return value.replace(/\{([a-zA-Z][a-zA-Z0-9]*)\}/g, (_, key) => {
+    if (!Object.hasOwn(variables, key)) configurationError(`Unknown text placeholder "${key}"`);
+    return String(variables[key]);
+  });
+}
+
+function text(path, values) {
+  return formatCopy(configured(path), values);
+}
+
+function escapeHtml(value) {
+  return String(value).replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[char]);
+}
+
+function imageUrl(key) {
+  return configured(`media.${key}`);
+}
+
+function applyConfiguration() {
+  if (!config || typeof config !== 'object') configurationError('site.config.js must define window.SITE_CONFIG');
+  templateValues.brand = configured('brand.name');
+  templateValues.slideCount = String(document.querySelectorAll('.hero-slide').length).padStart(2, '0');
+  for (const [key, value] of Object.entries(configured('media'))) {
+    if (typeof value !== 'string' || !value.trim()) configurationError(`Invalid image "media.${key}"`);
+    let url;
+    try { url = new URL(value, document.baseURI); }
+    catch { configurationError(`Invalid image URL "media.${key}"`); }
+    if (!['http:', 'https:', 'file:'].includes(url.protocol)) configurationError(`Unsupported image URL "media.${key}"`);
+  }
+  const ids = new Set();
+  for (const product of configured('products')) {
+    if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(product.id) || ids.has(product.id)) configurationError(`Invalid or duplicate product ID "${product.id}"`);
+    ids.add(product.id);
+    if (typeof configured(`categories.${product.category}`) !== 'string') configurationError(`Invalid category for "${product.id}"`);
+    imageUrl(product.image);
+    for (const field of ['name', 'badge', 'description', 'rating', 'reviews']) {
+      if (typeof product[field] !== 'string') configurationError(`Invalid product text "${product.id}.${field}"`);
+    }
+    if (![product.price, product.regular].every(value => typeof value === 'number' && Number.isFinite(value) && value >= 0)) configurationError(`Invalid price for "${product.id}"`);
+  }
+  const comments = [];
+  const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_COMMENT);
+  while (walker.nextNode()) if (walker.currentNode.nodeValue.startsWith('copy:')) comments.push(walker.currentNode);
+  for (const comment of comments) comment.replaceWith(document.createTextNode(text(comment.nodeValue.slice(5))));
+  for (const element of document.querySelectorAll('*')) {
+    for (const attribute of [...element.attributes]) {
+      if (!attribute.name.startsWith('data-config-')) continue;
+      const name = attribute.name.slice('data-config-'.length);
+      const value = name === 'image' ? imageUrl(configured(attribute.value)) : text(attribute.value);
+      if (name === 'text') element.textContent = value;
+      else element.setAttribute(name === 'image' ? 'src' : name, value);
+    }
+  }
+  document.documentElement.style.setProperty('--promotion-background', `url(${JSON.stringify(imageUrl('saleBanner'))})`);
+}
+
+applyConfiguration();
+const products = configured('products').map(product => ({ ...product, name: formatCopy(product.name), badge: formatCopy(product.badge), description: formatCopy(product.description) }));
+const categoryNames = Object.fromEntries(Object.entries(configured('categories')).map(([key, label]) => [key, formatCopy(label)]));
 const productById = new Map(products.map(product => [product.id, product]));
 const storageKey = 'atohome-storefront-preview-v1';
 const state = { cart: [], favorites: [], category: 'all', query: '' };
@@ -29,7 +95,7 @@ function icon(name) {
 }
 
 function money(value) {
-  return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(value);
+  return new Intl.NumberFormat(configured('format.locale'), { style: 'currency', currency: configured('format.currency') }).format(value);
 }
 
 function showToast(message) {
@@ -54,7 +120,7 @@ function restoreState() {
     state.favorites = [...new Set(saved.favorites.filter(id => productById.has(id)))];
   } catch (error) {
     console.warn('Could not restore storefront preview data:', error);
-    showToast('Saved bag could not be loaded. A new bag is ready for this visit.');
+    showToast(text('ui.feedback.restoreFailed'));
   }
 }
 
@@ -63,7 +129,7 @@ function persistState() {
     localStorage.setItem(storageKey, JSON.stringify({ cart: state.cart, favorites: state.favorites }));
   } catch (error) {
     console.warn('Could not save storefront preview data:', error);
-    showToast('Your browser could not save this bag. It is available for this visit only.');
+    showToast(text('ui.feedback.saveFailed'));
     return false;
   }
   return true;
@@ -71,11 +137,12 @@ function persistState() {
 
 function productCard(product) {
   const favorite = state.favorites.includes(product.id);
+  const values = { name: product.name, rating: product.rating, reviews: product.reviews };
   return `<article class="product-card">
-    <span class="product-badge">${product.badge}</span>
-    <button class="icon-button favorite-button" data-favorite="${product.id}" aria-label="${favorite ? 'Remove' : 'Save'} ${product.name} ${favorite ? 'from' : 'to'} favorites" aria-pressed="${favorite}">${icon('heart')}</button>
-    <button class="product-image-button" data-product="${product.id}" aria-label="View ${product.name}"><img src="assets/${product.image}.webp" alt="${product.name}" width="600" height="600" loading="lazy"></button>
-    <div class="product-card-copy"><p class="product-rating"><span class="sr-only">Rated ${product.rating} out of 5, </span><span aria-hidden="true">★★★★★</span><span>${product.rating} (${product.reviews})</span></p><button class="product-title" data-product="${product.id}">${product.name}</button><p class="product-prices">${money(product.price)} <del>${money(product.regular)}</del></p><button class="quick-add" data-add="${product.id}" aria-label="Add ${product.name} to bag">Add to Bag ${icon('plus')}</button></div>
+    <span class="product-badge">${escapeHtml(product.badge)}</span>
+    <button class="icon-button favorite-button" data-favorite="${escapeHtml(product.id)}" aria-label="${escapeHtml(text(favorite ? 'ui.product.favoriteRemove' : 'ui.product.favoriteAdd', values))}" aria-pressed="${favorite}">${icon('heart')}</button>
+    <button class="product-image-button" data-product="${escapeHtml(product.id)}" aria-label="${escapeHtml(text('ui.product.view', values))}"><img src="${escapeHtml(imageUrl(product.image))}" alt="${escapeHtml(text('ui.product.imageAlt', values))}" width="600" height="600" loading="lazy"></button>
+    <div class="product-card-copy"><p class="product-rating"><span class="sr-only">${escapeHtml(text('ui.product.ratingLabel', values))}</span><span aria-hidden="true">${escapeHtml(text('ui.product.stars'))}</span><span>${escapeHtml(text('ui.product.ratingSummary', values))}</span></p><button class="product-title" data-product="${escapeHtml(product.id)}">${escapeHtml(product.name)}</button><p class="product-prices">${money(product.price)} <del>${money(product.regular)}</del></p><button class="quick-add" data-add="${escapeHtml(product.id)}" aria-label="${escapeHtml(text('ui.product.addLabel', values))}">${escapeHtml(text('ui.product.add'))} ${icon('plus')}</button></div>
   </article>`;
 }
 
@@ -91,7 +158,7 @@ function renderShop() {
   });
   document.querySelector('#shop-title').textContent = categoryNames[state.category];
   document.querySelector('#shop-products').innerHTML = matches.map(productCard).join('');
-  document.querySelector('#result-count').textContent = `${matches.length} ${matches.length === 1 ? 'product' : 'products'}${state.query ? ' found' : ' to make yourself at home'}`;
+  document.querySelector('#result-count').textContent = text(matches.length === 1 ? 'ui.shop.oneResult' : 'ui.shop.manyResults', { count: matches.length }) + text(state.query ? 'ui.shop.searchSuffix' : 'ui.shop.browseSuffix');
   document.querySelector('#no-results').hidden = matches.length !== 0;
   document.querySelectorAll('[data-filter]').forEach(button => button.setAttribute('aria-pressed', String(button.dataset.filter === state.category)));
 }
@@ -99,7 +166,7 @@ function renderShop() {
 function closeMobileMenu() {
   document.querySelector('#mobile-menu').hidden = true;
   document.querySelector('#mobile-menu-toggle').setAttribute('aria-expanded', 'false');
-  document.querySelector('#mobile-menu-toggle').setAttribute('aria-label', 'Open navigation');
+  document.querySelector('#mobile-menu-toggle').setAttribute('aria-label', text('ui.navigation.open'));
 }
 
 function closeExploreMenu() {
@@ -123,7 +190,8 @@ function openShop(category = 'all', focusSearch = false) {
 function openProduct(id) {
   const product = productById.get(id);
   if (!product) return;
-  document.querySelector('#product-detail').innerHTML = `<div class="detail-layout"><div class="detail-image"><img src="assets/${product.image}.webp" alt="${product.name}" width="600" height="600"></div><div class="detail-copy"><span class="section-kicker">${product.badge.toUpperCase()}</span><h2 id="detail-title">${product.name}</h2><p class="product-rating"><span aria-hidden="true">★★★★★</span><span> ${product.rating} · ${product.reviews} reviews</span></p><p class="detail-description">${product.description}</p><p class="product-prices">${money(product.price)} <del>${money(product.regular)}</del></p><button class="button button-primary" data-add="${product.id}">Add to Bag ${icon('bag')}</button><p class="detail-features">${icon('shield')} Free shipping · 2-year warranty · 30-day returns</p></div></div>`;
+  const values = { name: product.name, rating: product.rating, reviews: product.reviews };
+  document.querySelector('#product-detail').innerHTML = `<div class="detail-layout"><div class="detail-image"><img src="${escapeHtml(imageUrl(product.image))}" alt="${escapeHtml(text('ui.product.imageAlt', values))}" width="600" height="600"></div><div class="detail-copy"><span class="section-kicker">${escapeHtml(product.badge.toUpperCase())}</span><h2 id="detail-title">${escapeHtml(product.name)}</h2><p class="product-rating"><span aria-hidden="true">${escapeHtml(text('ui.product.stars'))}</span><span>${escapeHtml(text('ui.product.detailRating', values))}</span></p><p class="detail-description">${escapeHtml(product.description)}</p><p class="product-prices">${money(product.price)} <del>${money(product.regular)}</del></p><button class="button button-primary" data-add="${escapeHtml(product.id)}">${escapeHtml(text('ui.product.add'))} ${icon('bag')}</button><p class="detail-features">${icon('shield')}${escapeHtml(text('ui.product.benefits'))}</p></div></div>`;
   productDialog.setAttribute('aria-labelledby', 'detail-title');
   productDialog.showModal();
 }
@@ -138,7 +206,7 @@ function updateBagCount() {
     counter.textContent = quantity;
     counter.hidden = quantity === 0;
   });
-  document.querySelector('[data-cart]').setAttribute('aria-label', `Open shopping bag, ${quantity} ${quantity === 1 ? 'item' : 'items'}`);
+  document.querySelector('[data-cart]').setAttribute('aria-label', text(quantity === 1 ? 'ui.cart.openOne' : 'ui.cart.openMany', { count: quantity }));
 }
 
 function addToCart(id) {
@@ -146,28 +214,29 @@ function addToCart(id) {
   if (!product) return;
   const row = state.cart.find(item => item.id === id);
   if (row && row.quantity === 99) {
-    showToast('You can add up to 99 of each item.');
+    showToast(text('ui.feedback.quantityLimit', { limit: 99 }));
     return;
   }
   if (row) row.quantity += 1;
   else state.cart.push({ id, quantity: 1 });
   updateBagCount();
-  if (persistState()) showToast(`${product.name} added to your bag`);
+  if (persistState()) showToast(text('ui.feedback.added', { name: product.name }));
   if (cartDialog.open) renderCart();
 }
 
 function renderCart() {
   const container = document.querySelector('#cart-items');
-  document.querySelector('#bag-quantity').textContent = `(${cartQuantity()})`;
+  document.querySelector('#bag-quantity').textContent = text('ui.cart.quantity', { count: cartQuantity() });
   document.querySelector('#cart-summary').hidden = state.cart.length === 0;
   document.querySelector('#checkout-note').hidden = true;
   if (!state.cart.length) {
-    container.innerHTML = `<div class="cart-empty">${icon('bag')}<h3>A little room for comfort.</h3><p>Your bag is empty. Let’s find your new favorite.</p><button class="button button-primary" data-shop="all">Explore the Collection ${icon('arrow')}</button></div>`;
+    container.innerHTML = `<div class="cart-empty">${icon('bag')}<h3>${escapeHtml(text('ui.cart.emptyTitle'))}</h3><p>${escapeHtml(text('ui.cart.emptyDescription'))}</p><button class="button button-primary" data-shop="all">${escapeHtml(text('ui.cart.emptyAction'))} ${icon('arrow')}</button></div>`;
     return;
   }
   container.innerHTML = state.cart.map(row => {
     const product = productById.get(row.id);
-    return `<article class="cart-row"><img src="assets/${product.image}.webp" alt="${product.name}" width="90" height="100"><div><h3>${product.name}</h3><p class="cart-row-price">${money(product.price)}</p><div class="cart-row-bottom"><div class="quantity-control"><button data-quantity="${row.id}" data-change="-1" aria-label="Decrease quantity of ${product.name}">${icon('minus')}</button><span aria-label="Quantity">${row.quantity}</span><button data-quantity="${row.id}" data-change="1" aria-label="Increase quantity of ${product.name}" ${row.quantity >= 99 ? 'disabled' : ''}>${icon('plus')}</button></div><button class="remove-item" data-remove="${row.id}" aria-label="Remove ${product.name}">Remove</button></div></div></article>`;
+    const values = { name: product.name };
+    return `<article class="cart-row"><img src="${escapeHtml(imageUrl(product.image))}" alt="${escapeHtml(text('ui.product.imageAlt', values))}" width="90" height="100"><div><h3>${escapeHtml(product.name)}</h3><p class="cart-row-price">${money(product.price)}</p><div class="cart-row-bottom"><div class="quantity-control"><button data-quantity="${escapeHtml(row.id)}" data-change="-1" aria-label="${escapeHtml(text('ui.cart.decrease', values))}">${icon('minus')}</button><span aria-label="${escapeHtml(text('ui.cart.quantityLabel'))}">${row.quantity}</span><button data-quantity="${escapeHtml(row.id)}" data-change="1" aria-label="${escapeHtml(text('ui.cart.increase', values))}" ${row.quantity >= 99 ? 'disabled' : ''}>${icon('plus')}</button></div><button class="remove-item" data-remove="${escapeHtml(row.id)}" aria-label="${escapeHtml(text('ui.cart.removeLabel', values))}">${escapeHtml(text('ui.cart.remove'))}</button></div></div></article>`;
   }).join('');
   const cents = state.cart.reduce((total, row) => total + Math.round(productById.get(row.id).price * 100) * row.quantity, 0);
   document.querySelector('#cart-total').textContent = money(cents / 100);
@@ -198,33 +267,21 @@ function toggleFavorite(id) {
   if (!productById.has(id)) return;
   const wasSaved = state.favorites.includes(id);
   state.favorites = wasSaved ? state.favorites.filter(item => item !== id) : [...state.favorites, id];
-  if (persistState()) showToast(wasSaved ? 'Removed from your favorites.' : 'Saved to your favorites. Find it under View All → Favorites.');
+  if (persistState()) showToast(text(wasSaved ? 'ui.feedback.favoriteRemoved' : 'ui.feedback.favoriteSaved'));
   // Update in place so keyboard focus stays on the button that was pressed.
   document.querySelectorAll('[data-favorite]').forEach(button => {
     if (button.dataset.favorite !== id) return;
     button.setAttribute('aria-pressed', String(!wasSaved));
-    button.setAttribute('aria-label', `${wasSaved ? 'Save' : 'Remove'} ${productById.get(id).name} ${wasSaved ? 'to' : 'from'} favorites`);
+    button.setAttribute('aria-label', text(wasSaved ? 'ui.product.favoriteAdd' : 'ui.product.favoriteRemove', { name: productById.get(id).name }));
   });
   if (state.category === 'favorites' && shopDialog.open) renderShop();
 }
 
-const infoContent = {
-  support: ['atohome Support', 'This storefront preview does not have a connected support service. Contact details can be added when the atohome store launches.'],
-  about: ['About atohome', 'A little more comfort, every day. Explore the atohome storefront preview to discover air care and home essentials.'],
-  manuals: ['atohome User Manuals', 'Product manuals have not been added to this storefront preview.'],
-  social: ['Connect with atohome', 'Social profiles for atohome have not been connected to this storefront preview.'],
-  regions: ['atohome Around the World', 'Regional storefronts for atohome have not been connected to this preview.'],
-  account: ['Make yourself at home.', 'This is an independent storefront preview. Account sign-in is not connected. You can explore products, save favorites, and keep a shopping bag in this browser.'],
-  shipping: ['A little more peace of mind.', 'The reference store advertises free shipping on eligible orders. This preview does not accept orders or calculate shipping. Shipping policies for atohome have not been configured in this preview.'],
-  returns: ['Comfort, with confidence.', 'The reference store advertises a 2-year limited warranty and 30-day returns. This preview does not process purchases or returns. Returns and warranty policies for atohome have not been configured in this preview.'],
-  privacy: ['Your privacy matters.', 'This independent preview has no analytics or tracking scripts. Your shopping bag and favorites are stored only in this browser. Email addresses are not collected or submitted. Links to official sites open those sites with their own privacy policies.'],
-  terms: ['About this storefront preview.', 'This is an independent recreation of the atohome homepage for demonstration. Brand names, product images, and reference copy belong to their respective owners. Product prices, ratings, and availability are illustrative and may change. No purchases, accounts, or email subscriptions are processed here.'],
-};
 
 function openInfo(key) {
-  const [title, copy] = infoContent[key] || infoContent.terms;
-  document.querySelector('#info-title').textContent = title;
-  document.querySelector('#info-copy').textContent = copy;
+  const { title, copy } = configured(`info.${key}`);
+  document.querySelector('#info-title').textContent = formatCopy(title);
+  document.querySelector('#info-copy').textContent = formatCopy(copy);
   infoDialog.showModal();
 }
 
@@ -267,13 +324,13 @@ document.querySelectorAll('dialog').forEach(dialog => {
   });
 });
 shopDialog.setAttribute('aria-labelledby', 'shop-title');
-cartDialog.setAttribute('aria-label', 'Your shopping bag');
+cartDialog.setAttribute('aria-label', text('ui.cart.dialogLabel'));
 infoDialog.setAttribute('aria-labelledby', 'info-title');
 
 document.querySelectorAll('.newsletter-form').forEach(form => form.addEventListener('submit', event => {
   event.preventDefault();
   const feedback = form.parentElement.querySelector('.form-feedback');
-  feedback.textContent = 'This is a storefront preview. Your email has not been collected or submitted.';
+  feedback.textContent = text('ui.feedback.subscription');
 }));
 
 document.querySelector('#checkout-button').addEventListener('click', () => {
@@ -285,7 +342,7 @@ mobileToggle.addEventListener('click', () => {
   const isOpen = mobileToggle.getAttribute('aria-expanded') === 'true';
   document.querySelector('#mobile-menu').hidden = isOpen;
   mobileToggle.setAttribute('aria-expanded', String(!isOpen));
-  mobileToggle.setAttribute('aria-label', isOpen ? 'Open navigation' : 'Close navigation');
+  mobileToggle.setAttribute('aria-label', text(isOpen ? 'ui.navigation.open' : 'ui.navigation.close'));
 });
 document.querySelectorAll('#mobile-menu a').forEach(link => link.addEventListener('click', closeMobileMenu));
 const exploreToggle = document.querySelector('#explore-toggle');
@@ -334,6 +391,7 @@ function showSlide(index) {
   slides.forEach((slide, i) => {
     slide.classList.toggle('is-active', i === currentSlide);
     slide.setAttribute('aria-hidden', String(i !== currentSlide));
+    slide.setAttribute('aria-label', text('ui.slideshow.position', { index: i + 1, total: slides.length }));
     slide.inert = i !== currentSlide;
   });
   dots.forEach((dot, i) => {
@@ -350,9 +408,9 @@ function scheduleSlide() {
 }
 
 function updatePauseButton() {
-  pauseButton.setAttribute('aria-label', userPaused ? 'Play slideshow' : 'Pause slideshow');
+  pauseButton.setAttribute('aria-label', text(userPaused ? 'ui.slideshow.playLabel' : 'ui.slideshow.pauseLabel'));
   pauseButton.setAttribute('aria-pressed', String(userPaused));
-  pauseButton.querySelector('span').textContent = userPaused ? '▷' : 'Ⅱ';
+  pauseButton.querySelector('span').textContent = text(userPaused ? 'ui.slideshow.playSymbol' : 'ui.slideshow.pauseSymbol');
 }
 
 dots.forEach(dot => dot.addEventListener('click', () => {
@@ -391,26 +449,21 @@ document.querySelector('.hero').addEventListener('touchend', event => {
   }
 }, { passive: true });
 
-const techImages = [
-  ['tech-filter', 'Replacing a atohome air purifier filter'],
-  ['tech-vacuum', 'atohome hands-free auto-empty vacuum technology'],
-  ['tech-quiet', 'atohome quiet operation technology for a peaceful home'],
-  ['tech-smart', 'Smart home control with the VeSync app'],
-];
 document.querySelectorAll('[data-tech]').forEach(button => button.addEventListener('click', () => {
   const index = Number(button.dataset.tech);
   document.querySelectorAll('.tech-item').forEach((item, i) => {
     item.classList.toggle('is-active', i === index);
     item.querySelector('button').setAttribute('aria-expanded', String(i === index));
-    item.querySelector('button span').textContent = i === index ? '−' : '+';
+    item.querySelector('button span').textContent = text(i === index ? 'ui.accordion.expanded' : 'ui.accordion.collapsed');
     item.querySelector('p').hidden = i !== index;
   });
   const image = document.querySelector('#technology-image');
-  image.src = `assets/${techImages[index][0]}.webp`;
-  image.alt = techImages[index][1];
+  const item = configured(`technology.images.${index}`);
+  image.src = imageUrl(item.image);
+  image.alt = formatCopy(item.alt);
 }));
 
-const promotionEnd = new Date('2026-12-01T00:00:00-08:00').getTime();
+const promotionEnd = new Date(configured('promotion.endsAt')).getTime();
 function updateCountdown() {
   const remaining = Math.max(0, Math.floor((promotionEnd - Date.now()) / 1000));
   const values = [Math.floor(remaining / 86400), Math.floor(remaining / 3600) % 24, Math.floor(remaining / 60) % 60, remaining % 60];
@@ -418,12 +471,15 @@ function updateCountdown() {
     document.querySelector(`#count-${unit}`).textContent = String(values[i]).padStart(2, '0');
   });
   if (remaining === 0) {
-    document.querySelector('#promo-title').textContent = 'More Comfort. Every Season.';
-    document.querySelector('.promo-banner>p').textContent = 'The Black Friday event has ended. Explore everyday essentials for a more comfortable home.';
-    document.querySelector('.promo-banner>.button').innerHTML = `Explore the Collection ${icon('arrow')}`;
+    document.querySelector('#promo-title').textContent = text('promotion.expired.title');
+    document.querySelector('.promo-banner>p').textContent = text('promotion.expired.description');
+    document.querySelector('.promo-banner>.button').innerHTML = `${escapeHtml(text('promotion.expired.action'))} ${icon('arrow')}`;
   }
 }
 
+if (!Number.isFinite(promotionEnd)) configurationError('Invalid promotion.endsAt');
+showSlide(0);
+document.querySelector('#cart-total').textContent = money(0);
 restoreState();
 renderTrending();
 updateBagCount();

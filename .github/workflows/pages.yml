@@ -30,7 +30,7 @@ jobs:
       - name: Prepare static site
         run: |
           mkdir _site
-          cp index.html styles.css app.js CNAME .nojekyll _site/
+          cp index.html styles.css app.js site.config.js CNAME .nojekyll _site/
           cp -R assets _site/assets
 
       - name: Upload site

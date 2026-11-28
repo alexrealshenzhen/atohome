@@ -111,7 +111,7 @@ p{line-height:1.5}
 .benefit-grid p{font-size:15px;line-height:1.5}
 .peace-image{border-radius:24px;height:420px;width:100%;object-fit:cover;object-position:65% center}
 .promo-wrap{padding:72px 0;background:#fbfcfe}
-.promo-banner{padding:50px 30px;text-align:center;background:#152143 url('assets/sale-banner.webp') center/cover;border-radius:26px;color:#fff;min-height:440px;display:flex;align-items:center;flex-direction:column;justify-content:center}
+.promo-banner{padding:50px 30px;text-align:center;background:#152143 var(--promotion-background) center/cover;border-radius:26px;color:#fff;min-height:440px;display:flex;align-items:center;flex-direction:column;justify-content:center}
 .countdown{display:flex;align-items:flex-start;justify-content:center;gap:20px;padding:18px 28px;border-radius:22px;background:#ffffff22;backdrop-filter:blur(8px);margin-bottom:25px}
 .countdown>div{width:70px}
 .countdown b{font-size:47px;font-weight:400;letter-spacing:-2px;line-height:1.1;font-variant-numeric:tabular-nums}
