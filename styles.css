@@ -194,7 +194,6 @@ p{line-height:1.5}
 .connection-dot{width:7px;height:7px;background:#5d9279;border-radius:50%;box-shadow:0 0 0 4px #5d927915}
 .trending{padding-bottom:45px}
 .product-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:24px}
-@media(min-width:901px){#trending-products{grid-template-columns:repeat(3,minmax(0,1fr))}}
 .product-card{position:relative;background:linear-gradient(#b7d3f0,#edf7fb 60%,#fff 87%);border-radius:23px;box-shadow:0 7px 18px #142c3c0a;overflow:hidden;border:1px solid #ecf1f5;display:flex;flex-direction:column;transition:transform .3s,box-shadow .3s;min-width:0}
 .product-card:hover{transform:translateY(-5px);box-shadow:0 13px 24px #142c3c13}
 .product-badge{position:absolute;left:18px;top:18px;color:#264563;background:#ffffffb0;font-size:10px;letter-spacing:.6px;text-transform:uppercase;border-radius:6px;padding:4px 8px;z-index:1}
