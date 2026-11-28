@@ -26,7 +26,8 @@
   },
   {
     "name": "air-hero",
-    "url": "https://levoit.com/cdn/shop/files/B_Desktop_Hero_Banner.png?width=1600",
+    "source": "user-provided",
+    "originalFile": "轮播图-1.png",
     "local": "assets/air-hero.webp"
   },
   {

@@ -81,7 +81,7 @@ window.SITE_LOCALES.es = {
           "title2": "Espacio para vivir mejor.",
           "description": "Protección avanzada frente a alérgenos en todos los rincones de tu hogar.",
           "airAction": "Ver purificador de aire ",
-          "airHeroImageAlt": "Un purificador Eleva 500X de {brand} en un salón familiar"
+          "airHeroImageAlt": "Purificador de aire de {brand} junto a una familia en un sal?n"
         }
       ],
       "controls": {
@@ -666,38 +666,6 @@ window.SITE_LOCALES.es = {
         "Aviso de cambio de filtro tras 2000 horas.",
         "Funciones de iones negativos y UV opcionales."
       ]
-    },
-    "vital-200s": {
-      "name": "Vital 200S-P — Purificador de aire inteligente",
-      "badge": "Más vendido",
-      "summary": "",
-      "description": "Un ambiente fresco para hogares con mascotas. El Vital 200S-P captura pelo, caspa y partículas del aire, con un control inteligente que facilita el cuidado del ambiente.",
-      "specifications": [],
-      "features": []
-    },
-    "core-300": {
-      "name": "Core® 300-P — Purificador de aire",
-      "badge": "Favorito de los clientes",
-      "summary": "",
-      "description": "Tu compañero para respirar aire limpio cada día. Su diseño compacto y funcionamiento silencioso llevan aire fresco al dormitorio, despacho y tus espacios favoritos.",
-      "specifications": [],
-      "features": []
-    },
-    "core-mini": {
-      "name": "Core® Mini-P — Purificador de aire",
-      "badge": "Pequeño y potente",
-      "summary": "",
-      "description": "Gran bienestar en espacios pequeños. Este purificador personal cabe en la mesilla o el escritorio, con controles sencillos y un diseño compacto.",
-      "specifications": [],
-      "features": []
-    },
-    "eleva-300x": {
-      "name": "Eleva™ 300X — Purificador de aire inteligente",
-      "badge": "Bienestar inteligente",
-      "summary": "",
-      "description": "Cuidado del aire para tu día a día. Filtración avanzada y sensores inteligentes en un diseño cuidado para disfrutar de más tranquilidad en casa.",
-      "specifications": [],
-      "features": []
     },
     "hair-dryer-red": {
       "name": "Secador de pelo — Rojo",

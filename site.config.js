@@ -30,9 +30,6 @@ window.SITE_CONFIG = {
     "livingRoom": "assets/living-room.webp",
     "petHero": "assets/pet-hero.webp",
     "petSolution": "assets/pet-solution.webp",
-    "productCore": "assets/product-core.webp",
-    "productMini": "assets/product-mini.webp",
-    "productVital": "assets/product-vital.webp",
     "saleBanner": "assets/sale-banner.webp",
     "sleepSolution": "assets/sleep-solution.webp",
     "techFilter": "assets/tech-filter.webp",
@@ -87,42 +84,6 @@ window.SITE_CONFIG = {
       "regular": null,
       "rating": null,
       "reviews": null
-    },
-    {
-      "id": "vital-200s",
-      "category": "air",
-      "image": "productVital",
-      "price": 159.99,
-      "regular": 189.99,
-      "rating": "4.8",
-      "reviews": "2,640"
-    },
-    {
-      "id": "core-300",
-      "category": "air",
-      "image": "productCore",
-      "price": 80.99,
-      "regular": 99.99,
-      "rating": "4.8",
-      "reviews": "3,210"
-    },
-    {
-      "id": "core-mini",
-      "category": "air",
-      "image": "productMini",
-      "price": 39.99,
-      "regular": 49.99,
-      "rating": "4.7",
-      "reviews": "1,960"
-    },
-    {
-      "id": "eleva-300x",
-      "category": "air",
-      "image": "categoryAir",
-      "price": 199.99,
-      "regular": 249.99,
-      "rating": "4.8",
-      "reviews": "426"
     },
     {
       "id": "hair-dryer-red",

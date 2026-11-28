@@ -81,7 +81,7 @@ window.SITE_LOCALES = { en: {
           "title2": "Room to Thrive.",
           "description": "Advanced allergen defense, from the front door to the family room.",
           "airAction": "Explore Air Purifier ",
-          "airHeroImageAlt": "{brand} Eleva 500X in a family living room"
+          "airHeroImageAlt": "{brand} air purifier beside a family in a living room"
         }
       ],
       "controls": {
@@ -666,38 +666,6 @@ window.SITE_LOCALES = { en: {
         "Filter-replacement reminder after 2,000 hours.",
         "Negative-ion and UV functions are optional."
       ]
-    },
-    "vital-200s": {
-      "name": "Vital 200S-P Smart Air Purifier",
-      "badge": "Bestseller",
-      "summary": "",
-      "description": "A fresh start for pet-friendly homes. The Vital 200S-P captures pet hair, dander, and everyday airborne particles, with smart control that makes cleaner air feel effortless.",
-      "specifications": [],
-      "features": []
-    },
-    "core-300": {
-      "name": "Core® 300-P Air Purifier",
-      "badge": "Fan Favorite",
-      "summary": "",
-      "description": "Your everyday clean-air companion. A compact design and whisper-quiet operation bring fresh air to bedrooms, home offices, and the spaces you love most.",
-      "specifications": [],
-      "features": []
-    },
-    "core-mini": {
-      "name": "Core® Mini-P Air Purifier",
-      "badge": "Small & Mighty",
-      "summary": "",
-      "description": "Big comfort for little spaces. This personal air purifier fits right into your nightstand or workspace, with simple controls and a compact footprint.",
-      "specifications": [],
-      "features": []
-    },
-    "eleva-300x": {
-      "name": "Eleva™ 300X Smart Air Purifier",
-      "badge": "Smart Comfort",
-      "summary": "",
-      "description": "Thoughtful air care for your everyday. Advanced filtration and smart sensing come together in a refined design, giving your home a little more peace of mind.",
-      "specifications": [],
-      "features": []
     },
     "hair-dryer-red": {
       "name": "Hair Dryer — Red",

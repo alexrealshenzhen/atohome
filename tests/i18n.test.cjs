@@ -45,6 +45,16 @@ test('catalog retains four canonical categories, valid product IDs and four JH f
   assert.equal(window.SITE_LOCALES.en.categories.filters, 'Filters & Accessories');
 });
 
+test('removed demo air purifiers cannot appear in the catalog or either language', () => {
+  const {window} = harness();
+  const retired = ['vital-200s', 'core-300', 'core-mini', 'eleva-300x'];
+  for (const id of retired) {
+    assert.ok(!window.SITE_CONFIG.products.some(product => product.id === id), id);
+    assert.ok(!window.SITE_CONFIG.featuredProducts.includes(id), id);
+    for (const language of ['en', 'es']) assert.ok(!Object.hasOwn(window.SITE_LOCALES[language].productText, id), `${language}.${id}`);
+  }
+});
+
 test('all category navigation surfaces include the canonical catalog categories', () => {
   const {window} = harness();
   const html = read('index.html');
