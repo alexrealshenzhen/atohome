@@ -4,7 +4,7 @@ window.SITE_LOCALES.es = {
   "meta": {
     "language": "es",
     "title": "{brand} — Un poco más de bienestar, cada día",
-    "description": "Descubre los purificadores de aire, purificadores para coche y secadores de pelo de {brand}. Productos para tu hogar y tu día a día."
+    "description": "Descubre los purificadores de aire, purificadores para coche, secadores de pelo, filtros y accesorios de {brand}. Productos para tu hogar y tu día a día."
   },
   "format": {
     "locale": "es-ES"
@@ -14,6 +14,7 @@ window.SITE_LOCALES.es = {
     "air": "Purificador de aire",
     "car-air": "Purificador de aire para coche",
     "hair-dryer": "Secador de pelo",
+    "filters": "Filtros y accesorios",
     "favorites": "Tus favoritos"
   },
   "copy": {

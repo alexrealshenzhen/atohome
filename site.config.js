@@ -23,6 +23,7 @@ window.SITE_CONFIG = {
     "atohomeLogo": "assets/atohome-logo.svg",
     "blackFriday": "assets/black-friday.webp",
     "categoryAir": "assets/jh02.webp",
+    "categoryFilter": "assets/category-filter.webp",
     "favicon": "assets/favicon.svg",
     "holidayHero": "assets/holiday-hero.webp",
     "holidayMobile": "assets/holiday-mobile.webp",
@@ -166,7 +167,8 @@ window.SITE_CONFIG = {
   "categoryIds": [
     "air",
     "car-air",
-    "hair-dryer"
+    "hair-dryer",
+    "filters"
   ],
   "defaultLanguage": "en"
 };

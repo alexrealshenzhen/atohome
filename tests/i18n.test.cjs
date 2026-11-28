@@ -30,17 +30,36 @@ function harness({url = 'https://atohome.cn/', saved, mutate} = {}) {
   return {window, values, events, i18n: window.StoreI18n};
 }
 
-test('catalog has three canonical categories, valid product IDs and four JH featured products', () => {
+test('catalog retains four canonical categories, valid product IDs and four JH featured products', () => {
   const {window} = harness();
   const config = window.SITE_CONFIG;
-  assert.deepEqual(Array.from(config.categoryIds), ['air', 'car-air', 'hair-dryer']);
+  assert.deepEqual(Array.from(config.categoryIds), ['air', 'car-air', 'hair-dryer', 'filters']);
   assert.equal(new Set(config.products.map(product => product.id)).size, config.products.length);
   assert.ok(config.products.every(product => config.categoryIds.includes(product.category)));
   assert.deepEqual(Array.from(config.featuredProducts), ['jh02', 'jh05', 'jh06', 'jh08']);
   assert.ok(config.featuredProducts.every(id => config.products.some(product => product.id === id)));
   assert.equal(config.products.filter(product => product.category === 'car-air').length, 0);
   for (const language of ['en', 'es']) {
-    assert.deepEqual(Object.keys(window.SITE_LOCALES[language].categories).sort(), ['air', 'all', 'car-air', 'favorites', 'hair-dryer']);
+    assert.deepEqual(Object.keys(window.SITE_LOCALES[language].categories).sort(), ['air', 'all', 'car-air', 'favorites', 'filters', 'hair-dryer']);
+  }
+  assert.equal(window.SITE_LOCALES.en.categories.filters, 'Filters & Accessories');
+});
+
+test('all category navigation surfaces include the canonical catalog categories', () => {
+  const {window} = harness();
+  const html = read('index.html');
+  const surfaces = {
+    desktop: /<nav\b[^>]*class="desktop-nav"[^>]*>([\s\S]*?)<\/nav>/,
+    mobile: /<nav\b[^>]*id="mobile-menu"[^>]*>([\s\S]*?)<\/nav>/,
+    cards: /<div class="category-grid">([\s\S]*?)<\/div>/,
+    footer: /<div class="footer-column"><h3><!--copy:categories.all--><\/h3>([\s\S]*?)<\/div>/,
+    filters: /<div class="filter-tabs"[^>]*>([\s\S]*?)<\/div>/,
+  };
+  for (const [name, pattern] of Object.entries(surfaces)) {
+    const section = html.match(pattern)?.[1];
+    assert.ok(section, `Missing category surface: ${name}`);
+    const categories = [...section.matchAll(/data-(?:shop|filter)="([^"]+)"/g)].map(match => match[1]).filter(id => !['all', 'favorites'].includes(id));
+    assert.deepEqual(categories, Array.from(window.SITE_CONFIG.categoryIds), name);
   }
 });
 

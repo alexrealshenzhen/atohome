@@ -4,7 +4,7 @@ window.SITE_LOCALES = { en: {
   "meta": {
     "language": "en",
     "title": "{brand} — A Little More Comfort, Every Day",
-    "description": "Discover air purifiers, car air purifiers, and hair dryers from {brand}. Explore products for your home and everyday routine."
+    "description": "Discover air purifiers, car air purifiers, hair dryers, filters and accessories from {brand}. Explore products for your home and everyday routine."
   },
   "format": {
     "locale": "en-US"
@@ -14,6 +14,7 @@ window.SITE_LOCALES = { en: {
     "air": "Air Purifier",
     "car-air": "Car Air Purifier",
     "hair-dryer": "Hair Dryer",
+    "filters": "Filters & Accessories",
     "favorites": "Your Favorites"
   },
   "copy": {
