@@ -64,8 +64,7 @@ window.SITE_CONFIG = {
   "featuredProducts": [
     "jh02",
     "jh05",
-    "jh06",
-    "jh08"
+    "jh06"
   ],
   "products": [
     {
