@@ -1,7 +1,6 @@
 'use strict';
 
-const config = window.SITE_CONFIG;
-const templateValues = {};
+let config = window.StoreI18n.configuration();
 
 function configurationError(message) {
   const notice = document.createElement('pre');
@@ -19,12 +18,7 @@ function configured(path) {
 }
 
 function formatCopy(value, values = {}) {
-  if (typeof value !== 'string') configurationError('Text values must be strings');
-  const variables = { ...templateValues, ...values };
-  return value.replace(/\{([a-zA-Z][a-zA-Z0-9]*)\}/g, (_, key) => {
-    if (!Object.hasOwn(variables, key)) configurationError(`Unknown text placeholder "${key}"`);
-    return String(variables[key]);
-  });
+  return window.StoreI18n.format(value, values);
 }
 
 function text(path, values) {
@@ -41,9 +35,6 @@ function imageUrl(key) {
 
 function applyConfiguration() {
   if (!config || typeof config !== 'object') configurationError('site.config.js must define window.SITE_CONFIG');
-  templateValues.brand = configured('brand.name');
-  templateValues.contactEmail = configured('newsletter.contactEmail');
-  templateValues.slideCount = String(document.querySelectorAll('.hero-slide').length).padStart(2, '0');
   for (const [key, value] of Object.entries(configured('media'))) {
     if (typeof value !== 'string' || !value.trim()) configurationError(`Invalid image "media.${key}"`);
     let url;
@@ -69,27 +60,19 @@ function applyConfiguration() {
   }
   const featured = configured('featuredProducts');
   if (!Array.isArray(featured) || !featured.length || new Set(featured).size !== featured.length || !featured.every(id => ids.has(id))) configurationError('featuredProducts must reference unique existing product IDs');
-  const comments = [];
-  const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_COMMENT);
-  while (walker.nextNode()) if (walker.currentNode.nodeValue.startsWith('copy:')) comments.push(walker.currentNode);
-  for (const comment of comments) comment.replaceWith(document.createTextNode(text(comment.nodeValue.slice(5))));
-  for (const element of document.querySelectorAll('*')) {
-    for (const attribute of [...element.attributes]) {
-      if (!attribute.name.startsWith('data-config-')) continue;
-      const name = attribute.name.slice('data-config-'.length);
-      const value = name === 'image' ? imageUrl(configured(attribute.value)) : text(attribute.value);
-      if (name === 'text') element.textContent = value;
-      else if (name === 'mailto') element.setAttribute('href', `mailto:${value}`);
-      else element.setAttribute(name === 'image' ? 'src' : name, value);
-    }
-  }
   document.documentElement.style.setProperty('--promotion-background', `url(${JSON.stringify(imageUrl('saleBanner'))})`);
 }
 
 applyConfiguration();
-const products = configured('products').map(product => ({ ...product, name: formatCopy(product.name), badge: formatCopy(product.badge), description: formatCopy(product.description), summary: formatCopy(product.summary) }));
-const categoryNames = Object.fromEntries(Object.entries(configured('categories')).map(([key, label]) => [key, formatCopy(label)]));
-const productById = new Map(products.map(product => [product.id, product]));
+let products;
+let categoryNames;
+let productById;
+function refreshCatalog() {
+  products = configured('products').map(product => ({ ...product, name: formatCopy(product.name), badge: formatCopy(product.badge), description: formatCopy(product.description), summary: formatCopy(product.summary) }));
+  categoryNames = Object.fromEntries(Object.entries(configured('categories')).map(([key, label]) => [key, formatCopy(label)]));
+  productById = new Map(products.map(product => [product.id, product]));
+}
+refreshCatalog();
 const storageKey = 'atohome-storefront-preview-v1';
 const state = { cart: [], favorites: [], category: 'all', query: '' };
 const shopDialog = document.querySelector('#shop-dialog');
@@ -98,6 +81,7 @@ const cartDialog = document.querySelector('#cart-dialog');
 const infoDialog = document.querySelector('#info-dialog');
 const searchInput = document.querySelector('#product-search');
 let toastTimer;
+let toastMessage;
 
 function icon(name) {
   return `<svg class="icon" aria-hidden="true"><use href="#i-${name}"/></svg>`;
@@ -107,9 +91,10 @@ function money(value) {
   return new Intl.NumberFormat(configured('format.locale'), { style: 'currency', currency: configured('format.currency') }).format(value);
 }
 
-function showToast(message) {
+function showToast(key, values = {}) {
   const toast = document.querySelector('#toast');
-  toast.textContent = message;
+  toastMessage = {key, values};
+  toast.textContent = text(key, values);
   toast.classList.add('is-visible');
   clearTimeout(toastTimer);
   toastTimer = setTimeout(() => toast.classList.remove('is-visible'), 3200);
@@ -122,14 +107,14 @@ function restoreState() {
     if (!Array.isArray(saved.cart) || !Array.isArray(saved.favorites)) throw new Error('Invalid saved storefront data');
     const ids = new Set();
     state.cart = saved.cart.filter(row => {
-      if (!row || !isPurchasable(productById.get(row.id)) || ids.has(row.id) || !Number.isInteger(row.quantity) || row.quantity < 1 || row.quantity > 99) return false;
+      if (!row || typeof row.id !== 'string' || !/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(row.id) || ids.has(row.id) || !Number.isInteger(row.quantity) || row.quantity < 1 || row.quantity > 99) return false;
       ids.add(row.id);
       return true;
     }).map(({ id, quantity }) => ({ id, quantity }));
-    state.favorites = [...new Set(saved.favorites.filter(id => productById.has(id)))];
+    state.favorites = [...new Set(saved.favorites.filter(id => typeof id === 'string' && /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(id)))];
   } catch (error) {
     console.warn('Could not restore storefront preview data:', error);
-    showToast(text('ui.feedback.restoreFailed'));
+    showToast('ui.feedback.restoreFailed');
   }
 }
 
@@ -138,7 +123,7 @@ function persistState() {
     localStorage.setItem(storageKey, JSON.stringify({ cart: state.cart, favorites: state.favorites }));
   } catch (error) {
     console.warn('Could not save storefront preview data:', error);
-    showToast(text('ui.feedback.saveFailed'));
+    showToast('ui.feedback.saveFailed');
     return false;
   }
   return true;
@@ -182,12 +167,16 @@ function renderShop() {
   const query = state.query.toLowerCase().trim();
   const matches = products.filter(product => {
     const categoryMatch = state.category === 'all' || (state.category === 'favorites' ? state.favorites.includes(product.id) : product.category === state.category);
-    return categoryMatch && `${product.name} ${product.category} ${product.description}`.toLowerCase().includes(query);
+    return categoryMatch && `${product.name} ${categoryNames[product.category]} ${product.description}`.toLocaleLowerCase(config.meta.language).includes(query);
   });
   document.querySelector('#shop-title').textContent = categoryNames[state.category];
   document.querySelector('#shop-products').innerHTML = matches.map(productCard).join('');
   document.querySelector('#result-count').textContent = text(matches.length === 1 ? 'ui.shop.oneResult' : 'ui.shop.manyResults', { count: matches.length }) + text(state.query ? 'ui.shop.searchSuffix' : 'ui.shop.browseSuffix');
   document.querySelector('#no-results').hidden = matches.length !== 0;
+  document.querySelector('#no-results').textContent = text(!state.query && configured('categoryIds').includes(state.category) ? 'copy.shop.emptyCategory' : 'copy.shop.description');
+  const retiredFavorites = document.querySelector('#retired-favorites');
+  retiredFavorites.hidden = state.category !== 'favorites' || state.favorites.every(id => productById.has(id));
+  retiredFavorites.textContent = text('ui.cart.retiredFavorites');
   document.querySelectorAll('[data-filter]').forEach(button => button.setAttribute('aria-pressed', String(button.dataset.filter === state.category)));
 }
 
@@ -226,7 +215,8 @@ function openProduct(id) {
   const badge = product.specifications.length ? product.badge : product.badge.toUpperCase();
   document.querySelector('#product-detail').innerHTML = `<div class="${layout}"><div class="detail-image"><img src="${escapeHtml(imageUrl(product.image))}" alt="${escapeHtml(text('ui.product.imageAlt', values))}" width="600" height="600"></div><div class="detail-copy"><span class="${badgeClass}">${escapeHtml(badge)}</span><h2 id="detail-title">${escapeHtml(product.name)}</h2>${rating}<p class="detail-description">${escapeHtml(product.description)}</p>${productPrices(product)}${purchase}${productInformation(product)}</div></div>`;
   productDialog.setAttribute('aria-labelledby', 'detail-title');
-  productDialog.showModal();
+  productDialog.dataset.productId = id;
+  if (!productDialog.open) productDialog.showModal();
 }
 
 function cartQuantity() {
@@ -248,20 +238,20 @@ function addToCart(id) {
   if (!isPurchasable(product)) return openProduct(id);
   const row = state.cart.find(item => item.id === id);
   if (row && row.quantity === 99) {
-    showToast(text('ui.feedback.quantityLimit', { limit: 99 }));
+    showToast('ui.feedback.quantityLimit', { limit: 99 });
     return;
   }
   if (row) row.quantity += 1;
   else state.cart.push({ id, quantity: 1 });
   updateBagCount();
-  if (persistState()) showToast(text('ui.feedback.added', { name: product.name }));
+  if (persistState()) showToast('ui.feedback.added', { name: product.name });
   if (cartDialog.open) renderCart();
 }
 
 function renderCart() {
   const container = document.querySelector('#cart-items');
   document.querySelector('#bag-quantity').textContent = text('ui.cart.quantity', { count: cartQuantity() });
-  document.querySelector('#cart-summary').hidden = state.cart.length === 0;
+  document.querySelector('#cart-summary').hidden = !state.cart.some(row => isPurchasable(productById.get(row.id)));
   document.querySelector('#checkout-note').hidden = true;
   if (!state.cart.length) {
     container.innerHTML = `<div class="cart-empty">${icon('bag')}<h3>${escapeHtml(text('ui.cart.emptyTitle'))}</h3><p>${escapeHtml(text('ui.cart.emptyDescription'))}</p><button class="button button-primary" data-shop="all">${escapeHtml(text('ui.cart.emptyAction'))} ${icon('arrow')}</button></div>`;
@@ -269,10 +259,11 @@ function renderCart() {
   }
   container.innerHTML = state.cart.map(row => {
     const product = productById.get(row.id);
+    if (!isPurchasable(product)) return `<article class="cart-row cart-row-retired"><span class="retired-item-icon">${icon('bag')}</span><div><h3>${escapeHtml(text('ui.cart.unavailableTitle'))}</h3><p>${escapeHtml(text('ui.cart.unavailableDescription'))}</p><button class="remove-item" data-remove="${escapeHtml(row.id)}">${escapeHtml(text('ui.cart.remove'))}</button></div></article>`;
     const values = { name: product.name };
     return `<article class="cart-row"><img src="${escapeHtml(imageUrl(product.image))}" alt="${escapeHtml(text('ui.product.imageAlt', values))}" width="90" height="100"><div><h3>${escapeHtml(product.name)}</h3><p class="cart-row-price">${money(product.price)}</p><div class="cart-row-bottom"><div class="quantity-control"><button data-quantity="${escapeHtml(row.id)}" data-change="-1" aria-label="${escapeHtml(text('ui.cart.decrease', values))}">${icon('minus')}</button><span aria-label="${escapeHtml(text('ui.cart.quantityLabel'))}">${row.quantity}</span><button data-quantity="${escapeHtml(row.id)}" data-change="1" aria-label="${escapeHtml(text('ui.cart.increase', values))}" ${row.quantity >= 99 ? 'disabled' : ''}>${icon('plus')}</button></div><button class="remove-item" data-remove="${escapeHtml(row.id)}" aria-label="${escapeHtml(text('ui.cart.removeLabel', values))}">${escapeHtml(text('ui.cart.remove'))}</button></div></div></article>`;
   }).join('');
-  const cents = state.cart.reduce((total, row) => total + Math.round(productById.get(row.id).price * 100) * row.quantity, 0);
+  const cents = state.cart.reduce((total, row) => total + (isPurchasable(productById.get(row.id)) ? Math.round(productById.get(row.id).price * 100) * row.quantity : 0), 0);
   document.querySelector('#cart-total').textContent = money(cents / 100);
 }
 
@@ -301,7 +292,7 @@ function toggleFavorite(id) {
   if (!productById.has(id)) return;
   const wasSaved = state.favorites.includes(id);
   state.favorites = wasSaved ? state.favorites.filter(item => item !== id) : [...state.favorites, id];
-  if (persistState()) showToast(text(wasSaved ? 'ui.feedback.favoriteRemoved' : 'ui.feedback.favoriteSaved'));
+  if (persistState()) showToast(wasSaved ? 'ui.feedback.favoriteRemoved' : 'ui.feedback.favoriteSaved');
   // Update in place so keyboard focus stays on the button that was pressed.
   document.querySelectorAll('[data-favorite]').forEach(button => {
     if (button.dataset.favorite !== id) return;
@@ -316,7 +307,8 @@ function openInfo(key) {
   const { title, copy } = configured(`info.${key}`);
   document.querySelector('#info-title').textContent = formatCopy(title);
   document.querySelector('#info-copy').textContent = formatCopy(copy);
-  infoDialog.showModal();
+  infoDialog.dataset.infoKey = key;
+  if (!infoDialog.open) infoDialog.showModal();
 }
 
 document.addEventListener('click', event => {
@@ -358,7 +350,6 @@ document.querySelectorAll('dialog').forEach(dialog => {
   });
 });
 shopDialog.setAttribute('aria-labelledby', 'shop-title');
-cartDialog.setAttribute('aria-label', text('ui.cart.dialogLabel'));
 infoDialog.setAttribute('aria-labelledby', 'info-title');
 
 const newsletterForms = [...document.querySelectorAll('[data-newsletter]')];
@@ -368,6 +359,7 @@ function newsletterFeedback(form, key, error = false) {
   const feedback = document.getElementById(form.elements.email.getAttribute('aria-describedby'));
   feedback.textContent = key ? text(`ui.newsletter.${key}`) : '';
   feedback.dataset.state = error ? 'error' : 'notice';
+  feedback.dataset.message = key;
 }
 
 function newsletterEndpoint() {
@@ -390,7 +382,7 @@ function finishNewsletter(code) {
   for (const form of newsletterForms) {
     const button = form.querySelector('button[type="submit"]');
     button.disabled = false;
-    button.replaceChildren(...pending.labels.get(button));
+    button.innerHTML = `${escapeHtml(text(form.dataset.newsletter === 'footer' ? 'copy.footer.newsletter.action' : 'copy.newsletter.action'))}${icon('arrow')}`;
   }
   pending.form.elements.email.readOnly = false;
   pending.form.elements.consent.disabled = false;
@@ -463,18 +455,16 @@ for (const form of newsletterForms) {
       field.value = value;
       transport.append(field);
     }
-    const labels = new Map(newsletterForms.map(item => {
+    newsletterForms.forEach(item => {
       const button = item.querySelector('button[type="submit"]');
-      const original = [...button.childNodes].map(node => node.cloneNode(true));
       button.disabled = true;
-      return [button, original];
-    }));
+    });
     form.querySelector('button[type="submit"]').textContent = text('ui.newsletter.submitting');
     form.setAttribute('aria-busy', 'true');
     input.readOnly = true;
     form.elements.consent.disabled = true;
     newsletterFeedback(form, 'sending');
-    newsletterPending = {id, form, frame, labels, timer: setTimeout(() => finishNewsletter('timeout'), configured('newsletter.timeoutMs'))};
+    newsletterPending = {id, form, frame, timer: setTimeout(() => finishNewsletter('timeout'), configured('newsletter.timeoutMs'))};
     document.body.append(transport);
     try { HTMLFormElement.prototype.submit.call(transport); }
     catch { finishNewsletter('failed'); }
@@ -634,3 +624,33 @@ renderTrending();
 updateBagCount();
 updateCountdown();
 setInterval(updateCountdown, 1000);
+
+window.addEventListener('site-language-change', () => {
+  config = window.StoreI18n.configuration();
+  refreshCatalog();
+  renderTrending();
+  if (shopDialog.open) renderShop();
+  if (productDialog.open) openProduct(productDialog.dataset.productId);
+  if (infoDialog.open) openInfo(infoDialog.dataset.infoKey);
+  const checkoutVisible = !document.querySelector('#checkout-note').hidden;
+  renderCart();
+  document.querySelector('#checkout-note').hidden = !checkoutVisible;
+  updateBagCount();
+  showSlide(currentSlide);
+  updatePauseButton();
+  updateCountdown();
+  mobileToggle.setAttribute('aria-label', text(mobileToggle.getAttribute('aria-expanded') === 'true' ? 'ui.navigation.close' : 'ui.navigation.open'));
+  const activeTech = Number(document.querySelector('.tech-item.is-active button').dataset.tech);
+  const technologyImage = document.querySelector('#technology-image');
+  technologyImage.src = imageUrl(configured(`technology.images.${activeTech}.image`));
+  technologyImage.alt = formatCopy(configured(`technology.images.${activeTech}.alt`));
+  document.querySelectorAll('.tech-item').forEach(item => {
+    item.querySelector('button span').textContent = text(item.classList.contains('is-active') ? 'ui.accordion.expanded' : 'ui.accordion.collapsed');
+  });
+  for (const form of newsletterForms) {
+    const feedback = document.getElementById(form.elements.email.getAttribute('aria-describedby'));
+    if (feedback.dataset.message) newsletterFeedback(form, feedback.dataset.message, feedback.dataset.state === 'error');
+  }
+  if (newsletterPending) newsletterPending.form.querySelector('button[type="submit"]').textContent = text('ui.newsletter.submitting');
+  if (toastMessage && document.querySelector('#toast').classList.contains('is-visible')) document.querySelector('#toast').textContent = text(toastMessage.key, toastMessage.values);
+});
