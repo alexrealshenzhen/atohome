@@ -7,7 +7,7 @@ window.SITE_CONFIG = {
   },
   "newsletter": {
     "endpoint": "https://script.google.com/macros/s/AKfycbwGG7xN2KxuNpwe9cBiXy8McQezSDf6Movdsqjr2zckDyHrnbVcmXpAr7wyYNf5-j53/exec",
-    "timeoutMs": 25000,
+    "timeoutMs": 60000,
     "contactEmail": "info.atohome@gmail.com"
   },
   "format": {
